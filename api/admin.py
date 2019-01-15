@@ -1,4 +1,5 @@
 from django.contrib import admin
-from api.models import MyStore
+#from api.models import *
+
 # Register your models here.
-admin.site.register(MyStore)
+#admin.site.register(Car)
