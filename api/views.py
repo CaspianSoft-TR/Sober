@@ -7,7 +7,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from api.models import Car
-from api.serializers import CarSerializer, UserSerializer, GroupSerializer
+from api.serializers import CarSerializer, UserSerializer, GroupSerializer, UserInfoSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -34,11 +34,19 @@ def user_register(request):
         return JsonResponse(serializer.data, safe=False)
 
     elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = UserSerializer(data=data)
+        result = {}
+        result["resultCode"] = 101;
+        result["resultText"] = "SUCCESS";
+        print(request.POST.get("username", ""))
+        print(request.POST.get("email", ""))
+        serializer = UserSerializer(data=request.POST)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+            #userProfileSerializer = UserInfoSerializer(data=request.POST)
+            #if userProfileSerializer.is_valid():
+            #    userProfileSerializer.save()
+            result["content"] = serializer.data;
+            return JsonResponse(result, status=status.HTTP_201_CREATED)
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

@@ -6,7 +6,8 @@ from api.models import UserInfo,Car
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ('url', 'username', 'email', 'groups')
+        #fields = ('url', 'username', 'email', 'groups')
+        fields = ('username', 'email')
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
