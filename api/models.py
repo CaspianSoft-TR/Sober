@@ -3,9 +3,27 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from decimal import Decimal
 
+# User additional info table 
+class UserInfo(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=50)
+    def __str__(self):
+        return self.contact_info
+
+
+class Customer(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    contact_info = models.CharField(max_length=50)
+    def __str__(self):
+        return self.contact_info
+
+
 class Car(models.Model):
     car_brand = models.CharField(max_length=50)
     number_plate = models.CharField(max_length=20)
+    gearType = models.IntegerField(choices=((0, 'UNKNOWN'), (1, 'AUTO'), (2, 'MANUAL') ), default=2)
+    color = models.CharField(max_length=100,default="")
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE,null=True)
     def __str__(self):
         return self.car_brand
 
@@ -18,31 +36,13 @@ class Category (models.Model):
 
 
 class Driver(models.Model):
-    driver_id = models.AutoField(primary_key=True)
-
-    name = models.OneToOneField(User, on_delete=models.CASCADE)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=200)
-    vehicle = models.ForeignKey(Car, on_delete=models.CASCADE)
-    #pickup_location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    #driver_id = models.AutoField(primary_key=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    #vehicle = models.ForeignKey(Car, on_delete=models.CASCADE)
     phone = models.CharField(max_length=50)
-
     def __str__(self):
-        return self.name
+        return self.phone
 
-
-class Customer(models.Model):
-    customer_id = models.AutoField(primary_key=True)
-
-    name = models.OneToOneField(User, related_name='rider_profile', on_delete=models.CASCADE)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=200)
-    #current_location = models.ForeignKey(Location, related_name='current_location', on_delete=models.CASCADE, null=True)
-    #pickup_location = models.ForeignKey(Location, related_name='rider_pickup', on_delete=models.CASCADE)
-    contact_info = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
 
 
 class DriverLocation (models.Model):

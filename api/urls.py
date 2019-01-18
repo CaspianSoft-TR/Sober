@@ -1,8 +1,9 @@
 from django.urls import path
 
-from . import views
+from api import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('template', views.temptest, name='temptest'),
+    path('car/', views.car_list),
+    path('car/<int:pk>/', views.car_detail),
+    path('user/register/', views.user_register),
 ]
