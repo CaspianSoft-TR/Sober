@@ -1,3 +1,4 @@
+'''
 from django.contrib.auth.models import User, Group
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -6,9 +7,26 @@ from rest_framework.decorators import api_view
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from api.models import Car
-from api.serializers import CarSerializer, UserSerializer, GroupSerializer, UserInfoSerializer
+#from api.models import Car
+from api.serializers import CarSerializer, UserSerializer, GroupSerializer, UserInfoSerializer, RegisterSerializer
+from rest_auth.registration.views import RegisterView
+from . import models
+from . import serializers
+#from . import serializers
+'''
+from rest_auth.registration.views import RegisterView
 
+from . import models
+from . import serializers
+
+
+class RegisterView(RegisterView):
+
+    def get_serializer_class(self):
+        return serializers.RegisterSerializer
+
+
+'''
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -35,17 +53,17 @@ def user_register(request):
 
     elif request.method == 'POST':
         result = {}
-        result["resultCode"] = 101;
-        result["resultText"] = "SUCCESS";
+        result["resultCode"] = 101
+        result["resultText"] = "SUCCESS"
         print(request.POST.get("username", ""))
         print(request.POST.get("email", ""))
         serializer = UserSerializer(data=request.POST)
         if serializer.is_valid():
             serializer.save()
             #userProfileSerializer = UserInfoSerializer(data=request.POST)
-            #if userProfileSerializer.is_valid():
+            # if userProfileSerializer.is_valid():
             #    userProfileSerializer.save()
-            result["content"] = serializer.data;
+            result["content"] = serializer.data
             return JsonResponse(result, status=status.HTTP_201_CREATED)
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -66,7 +84,7 @@ def car_list(request):
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET', 'POST' , 'DELETE'])
+@api_view(['GET', 'POST', 'DELETE'])
 def car_detail(request, pk):
     try:
         car = Car.objects.get(pk=pk)
@@ -88,4 +106,4 @@ def car_detail(request, pk):
     elif request.method == 'DELETE':
         car.delete()
         return HttpResponse(status=204)
-
+'''
