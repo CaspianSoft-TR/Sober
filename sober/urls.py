@@ -25,8 +25,14 @@ router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 
 
+api_urlpatterns = [
+    path('accounts/', include('rest_registration.api.urls')),
+]
+
+
 urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/', include('api.urls')),
+    path('api/v1/', include(api_urlpatterns)),
 ]

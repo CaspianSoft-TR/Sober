@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User, Group
+from django.contrib.auth.hashers import make_password
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets, status
@@ -35,23 +36,35 @@ def user_register(request):
 
     elif request.method == 'POST':
         result = {}
-        result["resultCode"] = 101;
-        result["resultText"] = "SUCCESS";
-        print(request.POST.get("username", ""))
-        print(request.POST.get("email", ""))
+        #print(request.POST.get("username", ""))
+        #print(request.POST.get("email", ""))
         serializer = UserSerializer(data=request.POST)
         if serializer.is_valid():
             serializer.save()
             #userProfileSerializer = UserInfoSerializer(data=request.POST)
             #if userProfileSerializer.is_valid():
             #    userProfileSerializer.save()
+            result["resultCode"] = 101;
+            result["resultText"] = "SUCCESS";
             result["content"] = serializer.data;
             return JsonResponse(result, status=status.HTTP_201_CREATED)
+
+        #result["resultCode"] = 201;
+        #result["resultText"] = "FAILURE";
+        #result["content"] = serializer.errors;
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @csrf_exempt
 def car_list(request):
+
+    result = {}
+    if not request.user.is_staff or not request.user.is_superuser:
+        result["resultCode"] = 201;
+        result["resultText"] = "FAILURE_AUTH";
+        result["content"] = status.HTTP_400_BAD_REQUEST;
+        return JsonResponse(result, safe=False) 
+
     if request.method == 'GET':
         cars = Car.objects.all()
         serializer = CarSerializer(cars, many=True)

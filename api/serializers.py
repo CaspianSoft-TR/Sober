@@ -4,10 +4,11 @@ from api.models import UserInfo,Car
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+    password = serializers.CharField(write_only=True)
     class Meta:
         model = User
         #fields = ('url', 'username', 'email', 'groups')
-        fields = ('username', 'email')
+        fields = ('username', 'email', 'password', 'first_name', 'last_name')
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
