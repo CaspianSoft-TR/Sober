@@ -1,6 +1,10 @@
 
 ### Python ###
 __pycache__/
+api/migrations/
+
+### DB ### 
+db.sqlite3
 
 # Windows files
 Thumbs.db
