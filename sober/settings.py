@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_registration',
+    #'rest_registration',
     'rest_auth',
     'rest_auth.registration',
     'allauth',
@@ -82,6 +82,7 @@ WSGI_APPLICATION = 'sober.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -92,8 +93,17 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-
-
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'sober',
+        'USER': 'postgres',
+        'PASSWORD': 'musadiq',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
 '''
 DATABASES = {
     'default': {
