@@ -177,3 +177,9 @@ REST_REGISTRATION = {
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'api.serializers.UserSerializer'
 }
+
+
+try:
+    from .local_settings import *
+except ImportError:
+    pass
