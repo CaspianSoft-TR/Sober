@@ -13,7 +13,8 @@ from rest_framework.response import Response
 from rest_framework.generics import (
     ListAPIView, 
     UpdateAPIView,
-    CreateAPIView 
+    CreateAPIView,
+    DestroyAPIView
     )
 
 from rest_auth.registration.views import RegisterView
@@ -24,7 +25,7 @@ from api.serializers import *
 
 class RegisterView(RegisterView):
     def get_serializer_class(self):
-        return serializers.RegisterSerializer
+        return RegisterSerializer
 
 
 class CarListAPIView(ListAPIView):
@@ -47,6 +48,7 @@ class CarCreateAPIView(CreateAPIView):
     authentication_classes = (TokenAuthentication,) 
     def perform_create(self, serializer):
         serializer.save(added_by=self.request.user)
+        #aşağıdaki degerleri return etmesi gerekir
         result = {}
         result["resultCode"] = 100;
         result["resultText"] = "SUCCESS";
@@ -54,8 +56,50 @@ class CarCreateAPIView(CreateAPIView):
         return JsonResponse(result)
 
 
+########################################
+########## USERCAR 
+########################################
+class UserCarCreateAPIView(CreateAPIView):
+    queryset = UserCar.objects.all()
+    serializer_class = UserCarSerializer
+    #permission_classes = (IsAdminUser,) 
+    #authentication_classes = (TokenAuthentication,) 
+    def perform_create(self, serializer):
+        #carId = Car.objects.get(id=serializer.validated_data['car_idx'])
+        #print(serializer.validated_data['car_idx'])
+
+        serializer.save(user=self.request.user)
+        print(">>> >>> UserCarCreateAPIView CALLED ")
+        result = {}
+        result["resultCode"] = 100;
+        result["resultText"] = "SUCCESS";
+        result["content"] = serializer.data
+        return JsonResponse(result)
 
 
+class UserCarListAllAPIView(ListAPIView):
+    queryset = UserCar.objects.all()
+    serializer_class = UserCarSerializer
+    #permission_classes = (IsAdminUser,) 
+    #authentication_classes = (TokenAuthentication,) 
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = UserCarSerializer(queryset, many=True)
+        result = {}
+        result["resultCode"] = 100;
+        result["resultText"] = "SUCCESS";
+        result["content"] = serializer.data
+        return JsonResponse(result)
+
+
+class UserCarDeleteAPIView(DestroyAPIView):
+    serializer_class = UserCarSerializer
+    #permission_classes = (IsAdminUser,) 
+    #authentication_classes = (TokenAuthentication,) 
+    def get_queryset(self):
+        queryset = UserCar.objects.filter(user_id=self.request.user.id, id=self.kwargs['pk'])
+        return queryset
+    
 
 
 

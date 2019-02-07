@@ -9,7 +9,11 @@ from allauth.utils import (
 from allauth.account import app_settings as allauth_settings
 from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.serializers import UserDetailsSerializer
-from api.models import UserInfo, Car
+from api.models import (
+    UserInfo, 
+    Car, 
+    UserCar
+    )
 
 
 class UserSerializer(UserDetailsSerializer):
@@ -63,6 +67,8 @@ class RegisterSerializer(serializers.Serializer):
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
     phone = serializers.CharField(source="userinfo.phone")
+    is_driver = serializers.BooleanField(default=False)
+    is_customer = serializers.BooleanField(default=True)
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
@@ -104,6 +110,8 @@ class RegisterSerializer(serializers.Serializer):
 
         newUserInfo = UserInfo()
         newUserInfo.phone = request.POST.get("phone", "")
+        newUserInfo.is_customer = (request.POST.get("is_customer")=='true' or request.POST.get("is_customer")=='True')
+        newUserInfo.is_driver = (request.POST.get("is_driver")=='true' or request.POST.get("is_driver")=='True')
         newUserInfo.user = user 
         newUserInfo.save()
 
@@ -139,20 +147,22 @@ class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
         fields = ('brand', 'model', 'modelyear')
-        
 
-'''
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    password = serializers.CharField(write_only=True)
+
+class UserCarSerializer(serializers.ModelSerializer):
+    car_id = serializers.IntegerField()
     class Meta:
-        model = User
-        #fields = ('url', 'username', 'email', 'groups')
-        fields = ('username', 'email', 'password', 'first_name', 'last_name')
+        model = UserCar
+        fields = ('number_plate', 'color', 'gear_type' , 'car_id' )
 
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Group
-        fields = ('url', 'name')
 
-'''
+
+
+
+
+
+
+
+
+

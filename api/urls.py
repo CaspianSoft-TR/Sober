@@ -3,7 +3,10 @@ from django.conf.urls import url
 from api import views
 from .views import (
 	CarListAPIView,
-	CarCreateAPIView
+	CarCreateAPIView,
+    UserCarCreateAPIView,
+    UserCarListAllAPIView,
+    UserCarDeleteAPIView
 	)
 
 urlpatterns = [
@@ -13,8 +16,13 @@ urlpatterns = [
     #path('reg/', views.CustomRegistrationView.as_view()),
     #path('car/<int:pk>/', views.car_detail),
     #path('car/', views.car_operations),
-    
+
     path('car/create', CarCreateAPIView.as_view() , name='car-add'),
     path('car/', CarListAPIView.as_view() , name='car-list'),
-    path('reg', views.RegisterView.as_view()),
+    path('register/', views.RegisterView.as_view()),
+
+
+    path('user/car/create', UserCarCreateAPIView.as_view() , name='user-car-add'),
+    path('user/car/list-all', UserCarListAllAPIView.as_view() , name='user-car-list-all'),
+    path('user/car/delete/<int:pk>/', UserCarDeleteAPIView.as_view() , name='user-car-delete'),
 ]
