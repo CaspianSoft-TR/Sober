@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_registration',
+    #'rest_registration',
     'rest_auth',
     'rest_auth.registration',
     'allauth',
@@ -82,6 +82,7 @@ WSGI_APPLICATION = 'sober.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -92,8 +93,17 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-
-
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'sober',
+        'USER': 'postgres',
+        'PASSWORD': 'musadiq',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
 '''
 DATABASES = {
     'default': {
@@ -134,7 +144,11 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'sober/static')
+]
 SITE_ID = 1
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
@@ -168,3 +182,9 @@ REST_REGISTRATION = {
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'api.serializers.UserSerializer'
 }
+
+
+try:
+    from .local_settings import *
+except ImportError:
+    pass
