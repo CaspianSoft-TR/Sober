@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from decimal import Decimal
@@ -60,8 +61,25 @@ class Booking(BaseModel):
     driver = models.ForeignKey(User,on_delete=models.CASCADE,null=True,related_name='driver_id')
     status = models.IntegerField(choices=((0, 'NEW'), (1, 'ACCEPTED'), (2, 'REJECTED')), default=0)
     payment_type = models.IntegerField(choices=((0, 'CASH'), (1, 'CREDIT CARD')), default=0)
+    driver_rate = models.IntegerField(null=True,validators=[MaxValueValidator(5),MinValueValidator(0)])
     def __str__(self):
         return 'Booking from #{}'.format(self.customer.username)
+
+
+class Address(models.Model):
+    booking = models.ForeignKey(Booking,null=True,on_delete=models.CASCADE,related_name='booking_id')
+    user = models.ForeignKey(User,null=True,on_delete=models.CASCADE,related_name='user_id')
+    title = models.CharField(max_length=50)
+    description = models.CharField(max_length=50)
+    longitude = models.CharField(max_length=10,default=0)
+    latitude = models.CharField(max_length=10,default=0)
+    is_pickup_loc = models.BooleanField(default=False)
+    is_arrival_loc = models.BooleanField(default=False)
+    def __str__(self):
+        return 'address'
+
+
+
 
 
 

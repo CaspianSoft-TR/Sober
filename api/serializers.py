@@ -12,7 +12,8 @@ from rest_auth.serializers import UserDetailsSerializer
 from api.models import (
     UserInfo, 
     Car, 
-    UserCar
+    UserCar,
+    Address
     )
 
 
@@ -155,6 +156,11 @@ class UserCarSerializer(serializers.ModelSerializer):
         model = UserCar
         fields = ('number_plate', 'color', 'gear_type' , 'car_id' )
 
+
+class UserAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = ('title','description','longitude','latitude')
 
 
 
