@@ -119,6 +119,22 @@ class UserAddressCreateAPIView(CreateAPIView):
         return JsonResponse(result)
 
 
+class UserAddressListAPIView(ListAPIView):
+    queryset = Address.objects.all()
+    serializer_class = UserAddressSerializer
+    #permission_classes = (IsAdminUser,) 
+    #authentication_classes = (TokenAuthentication,) 
+    def list(self, request):
+        queryset = self.get_queryset()
+        queryset = queryset.filter(user_id=self.request.user.id)
+        serializer = UserAddressSerializer(queryset, many=True)
+        result = {}
+        result["resultCode"] = 100;
+        result["resultText"] = "SUCCESS";
+        result["content"] = serializer.data
+        return JsonResponse(result)
+
+
 class UserAddressDeleteAPIView(DestroyAPIView):
     serializer_class = UserAddressSerializer
     #permission_classes = (IsAdminUser,) 

@@ -27,4 +27,5 @@ urlpatterns = [
     path('user/car/delete/<int:pk>/', views.UserCarDeleteAPIView.as_view() , name='user-car-delete'),
     path('user/address/add', views.UserAddressCreateAPIView.as_view() , name='user-address-add'),
     path('user/address/delete/<int:pk>/', views.UserAddressDeleteAPIView.as_view() , name='user-address-delete'),
+    path('user/address/list/', views.UserAddressListAPIView.as_view() , name='user-address-list-owner'),
 ]
