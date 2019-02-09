@@ -3,7 +3,6 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.hashers import make_password
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAdminUser
 from rest_framework.decorators import api_view
@@ -14,9 +13,10 @@ from rest_framework.generics import (
     ListAPIView, 
     UpdateAPIView,
     CreateAPIView,
-    DestroyAPIView
+    DestroyAPIView,
     )
-
+from rest_framework.views import APIView
+from rest_framework import viewsets, status
 from rest_auth.registration.views import RegisterView
 from . import models
 from . import serializers
@@ -210,6 +210,34 @@ class BookingListAPIView(ListAPIView):
         result["resultCode"] = 100;
         result["resultText"] = "SUCCESS";
         result["content"] = bookList
+        return JsonResponse(result)
+
+
+
+class BookingCancelAPIView(APIView):
+    def get_queryset(self):
+        queryset = Booking.objects.filter(customer_id=self.request.user.id, status=0,id=self.request.POST.get('id'))
+        return queryset
+    
+    def put(self, request, format=None):
+        print(">>> >>> BookingCancelAPIView put called")
+        bookList = self.get_queryset()
+        result = {}
+        if bookList.count() == 0:
+            result["resultCode"] = 200;
+            result["resultText"] = "SUCCESS_EMPTY";
+            result["content"] = "Book Not Found Error"
+        elif bookList.count() > 1:
+            result["resultCode"] = 200;
+            result["resultText"] = "FAILURE";
+            result["content"] = "Multiple Book Error"
+        else:
+            book = bookList.first()
+            book.status = 100
+            book.save()
+            result["resultCode"] = 100;
+            result["resultText"] = "SUCCESS";
+            result["content"] = "Customer's book status was changed to CANCEL"
         return JsonResponse(result)
 
 

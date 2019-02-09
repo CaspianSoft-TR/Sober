@@ -24,6 +24,7 @@ urlpatterns = [
     path('user/address/list-all/', views.UserAddressListAllAPIView.as_view() , name='user-address-list-all'),
     path('booking/new', views.BookingCreateAPIView.as_view() , name='booking-new'),
     path('booking/list', views.BookingListAPIView.as_view() , name='booking-new'),
+    path('booking/cancel/', views.BookingCancelAPIView.as_view() , name='booking-cancel'),
 
     path('test', views.TestCreateAPIView.as_view() , name='test'),
 ]

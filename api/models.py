@@ -59,7 +59,7 @@ class UserCar(BaseModel):
 class Booking(BaseModel):
     customer = models.ForeignKey(User,on_delete=models.CASCADE,related_name='customer_id')
     driver = models.ForeignKey(User,on_delete=models.CASCADE,null=True,related_name='driver_id')
-    status = models.IntegerField(choices=((0, 'NEW'), (1, 'ACCEPTED'), (2, 'REJECTED')), default=0)
+    status = models.IntegerField(choices=((0, 'NEW'), (1, 'ACCEPTED'), (2, 'REJECTED'), (100, 'CANCEL')), default=0)
     payment_type = models.IntegerField(choices=((0, 'CASH'), (1, 'CREDIT CARD')), default=0)
     driver_rate = models.IntegerField(null=True,validators=[MaxValueValidator(5),MinValueValidator(0)])
     def __str__(self):
