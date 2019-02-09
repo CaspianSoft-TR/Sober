@@ -13,7 +13,8 @@ from api.models import (
     UserInfo, 
     Car, 
     UserCar,
-    Address
+    Address,
+    Booking
     )
 
 
@@ -117,7 +118,6 @@ class RegisterSerializer(serializers.Serializer):
         newUserInfo.save()
 
         #userInfoData = request.POST.copy()
-
         #print(">>>>>>>>>>>>><")
         #print(request.POST.get("phone", ""))
         #print(user.username)
@@ -163,7 +163,88 @@ class UserAddressSerializer(serializers.ModelSerializer):
         fields = ('title','description','longitude','latitude')
 
 
+class BookingAddressSerializer(serializers.ListSerializer):
+    class Meta:
+        model = Address
+        fields = ('title','description','longitude','latitude')
 
+
+class BookingSerializer(serializers.Serializer):
+    pickup_address_title = serializers.CharField(max_length=50)
+    pickup_address_description = serializers.CharField(max_length=50)
+    pickup_address_longitude = serializers.CharField(max_length=10,default=0)
+    pickup_address_latitude = serializers.CharField(max_length=10,default=0)
+    arrival_address_title = serializers.CharField(max_length=50)
+    arrival_address_description = serializers.CharField(max_length=50)
+    arrival_address_longitude = serializers.CharField(max_length=10,default=0)
+    arrival_address_latitude = serializers.CharField(max_length=10,default=0)
+    payment_type = serializers.IntegerField(default=0)
+
+    def validate(self, data):
+        if data['payment_type'] < 0 and data['payment_type'] > 1:
+            raise serializers.ValidationError(("Payment type should be 0 for cash and 1 for credit card"))
+        return data
+
+    def save(self, request):
+        newBook = Booking()
+        newBook.customer = request.user
+        newBook.payment_type = request.POST.get("payment_type")
+        newBook.save()
+
+        pickupAddress = Address()
+        pickupAddress.title = request.POST.get("pickup_address_title")
+        pickupAddress.description = request.POST.get("pickup_address_description")
+        pickupAddress.longitude = request.POST.get("pickup_address_longitude")
+        pickupAddress.latitude = request.POST.get("pickup_address_latitude")
+        pickupAddress.is_pickup_loc = True
+        pickupAddress.booking = newBook
+        pickupAddress.save()
+
+        arrivalAddress = Address()
+        arrivalAddress.title = request.POST.get("arrival_address_title")
+        arrivalAddress.description = request.POST.get("arrival_address_description")
+        arrivalAddress.longitude = request.POST.get("arrival_address_longitude")
+        arrivalAddress.latitude = request.POST.get("arrival_address_latitude")
+        arrivalAddress.is_arrival_loc = True
+        arrivalAddress.booking = newBook
+        arrivalAddress.save()
+        return newBook
+
+
+
+
+########################################
+########## TEST SERIALIZER
+########################################
+from datetime import datetime
+class TestClass(object):
+    def __init__(self, email, content, created=None):
+        self.email = email
+        self.content = content
+        self.created = created or datetime.now()
+
+
+
+from rest_framework.renderers import JSONRenderer
+class TESTSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    content = serializers.CharField(max_length=200)
+    created = serializers.DateTimeField()
+
+    def create(self, validated_data):
+        print(">>> >>> TESTSerializer update CALLED ")
+        print(type(validated_data))
+
+        testClass = TestClass(email='ksk@example.com', content='TEST Content')
+        #return JSONRenderer().render(validated_data)
+        return testClass
+
+    def update(self, instance, validated_data):
+        print(">>> >>> TESTSerializer update CALLED ")
+        instance.email = validated_data.get('email', instance.email)
+        instance.content = validated_data.get('content', instance.content)
+        instance.created = validated_data.get('created', instance.created)
+        return instance
 
 
 

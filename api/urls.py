@@ -11,16 +11,9 @@ from .views import (
 
 urlpatterns = [
 
-    #url(r'^$', CustomRegistrationView.as_view(), name='rest_register'),
-    #path('user/register/', views.user_register),
-    #path('reg/', views.CustomRegistrationView.as_view()),
-    #path('car/<int:pk>/', views.car_detail),
-    #path('car/', views.car_operations),
-
     path('car/create', CarCreateAPIView.as_view() , name='car-add'),
     path('car/', CarListAPIView.as_view() , name='car-list'),
     path('register/', views.RegisterView.as_view()),
-
 
     path('user/car/create', UserCarCreateAPIView.as_view() , name='user-car-add'),
     path('user/car/list-all', UserCarListAllAPIView.as_view() , name='user-car-list-all'),
@@ -29,4 +22,8 @@ urlpatterns = [
     path('user/address/delete/<int:pk>/', views.UserAddressDeleteAPIView.as_view() , name='user-address-delete'),
     path('user/address/list/', views.UserAddressListAPIView.as_view() , name='user-address-list-owner'),
     path('user/address/list-all/', views.UserAddressListAllAPIView.as_view() , name='user-address-list-all'),
+    path('booking/new', views.BookingCreateAPIView.as_view() , name='booking-new'),
+    path('booking/list', views.BookingListAPIView.as_view() , name='booking-new'),
+
+    path('test', views.TestCreateAPIView.as_view() , name='test'),
 ]

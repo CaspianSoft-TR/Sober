@@ -160,6 +160,81 @@ class UserAddressDeleteAPIView(DestroyAPIView):
 
 
 
+########################################
+########## BOOKING
+########################################
+class BookingCreateAPIView(CreateAPIView):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+    #permission_classes = (IsAdminUser,) 
+    #authentication_classes = (TokenAuthentication,) 
+    def perform_create(self, serializer):
+        print(">>> >>> BookingCreateAPIView CALLED ")
+        serializer.save(self.request)        
+        result = {}
+        result["resultCode"] = 100;
+        result["resultText"] = "SUCCESS";
+        result["content"] = serializer.data
+        return JsonResponse(result)
+
+
+class BookingListAPIView(ListAPIView):
+    queryset = Booking.objects.all()
+    #permission_classes = (IsAdminUser,) 
+    #authentication_classes = (TokenAuthentication,) 
+    def list(self, request):
+        print(">>> >>> BookingListAPIView CALLED ")
+        queryset = self.get_queryset().filter(customer_id=self.request.user.id)
+        bookList = []
+        for book in queryset:
+            bookDic = {}
+            bookDic['id'] = book.id
+            bookDic['payment_type'] = book.payment_type
+            bookDic['driver_rate'] = book.driver_rate
+            bookDic['status'] = book.status
+            addressQuerySet = Address.objects.all()
+            addressQuerySet = addressQuerySet.filter(booking_id=book.id)
+            for address in addressQuerySet:
+                if address.is_pickup_loc:
+                    bookDic['pickup_address_longitude'] = address.longitude
+                    bookDic['pickup_address_latitude'] = address.latitude
+                    bookDic['pickup_address_description'] = address.description
+                elif address.is_arrival_loc:
+                    bookDic['arrival_address_longitude'] = address.longitude
+                    bookDic['arrival_address_latitude'] = address.latitude
+                    bookDic['arrival_address_description'] = address.description
+                
+            bookList.append(bookDic.copy())
+
+        result = {}
+        result["resultCode"] = 100;
+        result["resultText"] = "SUCCESS";
+        result["content"] = bookList
+        return JsonResponse(result)
+
+
+########################################
+########## TEST TEST TEST 
+########################################
+class TestCreateAPIView(CreateAPIView):
+    queryset = Booking.objects.all()
+    serializer_class = TESTSerializer
+    #permission_classes = (IsAdminUser,) 
+    #authentication_classes = (TokenAuthentication,) 
+    def perform_create(self, serializer):
+        print(">>> >>> TestCreateAPIView CALLED ")
+        print( type(serializer) )
+
+        serializer.save(user=self.request.user)
+
+        result = {}
+        result["resultCode"] = 100;
+        result["resultText"] = "SUCCESS";
+        result["content"] = serializer.data
+        return JsonResponse(result)
+
+
+
 
 
 
