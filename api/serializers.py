@@ -5,17 +5,18 @@ from allauth.account.utils import setup_user_email
 from allauth.utils import (
     email_address_exists,
     get_username_max_length
-    )
+)
 from allauth.account import app_settings as allauth_settings
 from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.serializers import UserDetailsSerializer
 from api.models import (
-    UserInfo, 
-    Car, 
+    UserInfo,
+    Car,
     UserCar,
     Address,
-    Booking
-    )
+    Booking,
+    Driver
+)
 
 
 class UserSerializer(UserDetailsSerializer):
@@ -39,12 +40,11 @@ class UserSerializer(UserDetailsSerializer):
         return instance
 
 
-
 class UserInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserInfo
-        fields = ('user','phone')
+        fields = ('user', 'phone')
 
     # Override CREATE method
     def create(self, validated_data):
@@ -58,7 +58,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
         return instance
 
 
-# CUSTOM REGISTER SERIALIZER 
+# CUSTOM REGISTER SERIALIZER
 class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField(
         max_length=get_username_max_length(),
@@ -112,36 +112,36 @@ class RegisterSerializer(serializers.Serializer):
 
         newUserInfo = UserInfo()
         newUserInfo.phone = request.POST.get("phone", "")
-        newUserInfo.is_customer = (request.POST.get("is_customer")=='true' or request.POST.get("is_customer")=='True')
-        newUserInfo.is_driver = (request.POST.get("is_driver")=='true' or request.POST.get("is_driver")=='True')
-        newUserInfo.user = user 
+        newUserInfo.is_customer = (request.POST.get("is_customer") == 'true' or request.POST.get("is_customer") == 'True')
+        newUserInfo.is_driver = (request.POST.get("is_driver") == 'true' or request.POST.get("is_driver") == 'True')
+        newUserInfo.user = user
         newUserInfo.save()
 
         #userInfoData = request.POST.copy()
-        #print(">>>>>>>>>>>>><")
+        # print(">>>>>>>>>>>>><")
         #print(request.POST.get("phone", ""))
-        #print(user.username)
-        #print(">>>>>>>>>>>>><")
+        # print(user.username)
+        # print(">>>>>>>>>>>>><")
 
-        #print(">>>>>>>>>>>>><")
-        #print(userInfoData)
-        #print(">>>>>>>>>>>>><")
+        # print(">>>>>>>>>>>>><")
+        # print(userInfoData)
+        # print(">>>>>>>>>>>>><")
 
         #userInfo = UserInfoSerializer(data=userInfoData)
-        # is_valid() serializer data ile oluşması sonucu alınır 
-        #if userInfo.is_valid():
-            #print(userInfo.validated_data)
-            #print(user.username)
-            #userInfo.save()
+        # is_valid() serializer data ile oluşması sonucu alınır
+        # if userInfo.is_valid():
+        # print(userInfo.validated_data)
+        # print(user.username)
+        # userInfo.save()
 
-        #print(user)
+        # print(user)
         return user
 
 
 class CarDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
-        fields = ('brand', 'model', 'modelyear','added_by')
+        fields = ('brand', 'model', 'modelyear', 'added_by')
 
 
 class CarSerializer(serializers.ModelSerializer):
@@ -152,32 +152,57 @@ class CarSerializer(serializers.ModelSerializer):
 
 class UserCarSerializer(serializers.ModelSerializer):
     car_id = serializers.IntegerField()
+
     class Meta:
         model = UserCar
-        fields = ('number_plate', 'color', 'gear_type' , 'car_id' )
+        fields = ('number_plate', 'color', 'gear_type', 'car_id')
 
 
 class UserAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
-        fields = ('title','description','longitude','latitude')
+        fields = ('title', 'description', 'longitude', 'latitude')
+
+# Driver National ID serializer
+
+
+class DriverIDSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Driver
+        fields = (
+
+            'national_id',
+
+        )
+
+# Driver  DriverLicense serializer
+
+
+class DriverLicenseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Driver
+        fields = (
+
+            'driver_license',
+
+        )
 
 
 class BookingAddressSerializer(serializers.ListSerializer):
     class Meta:
         model = Address
-        fields = ('title','description','longitude','latitude')
+        fields = ('title', 'description', 'longitude', 'latitude')
 
 
 class BookingSerializer(serializers.Serializer):
     pickup_address_title = serializers.CharField(max_length=50)
     pickup_address_description = serializers.CharField(max_length=50)
-    pickup_address_longitude = serializers.CharField(max_length=10,default=0)
-    pickup_address_latitude = serializers.CharField(max_length=10,default=0)
+    pickup_address_longitude = serializers.CharField(max_length=10, default=0)
+    pickup_address_latitude = serializers.CharField(max_length=10, default=0)
     arrival_address_title = serializers.CharField(max_length=50)
     arrival_address_description = serializers.CharField(max_length=50)
-    arrival_address_longitude = serializers.CharField(max_length=10,default=0)
-    arrival_address_latitude = serializers.CharField(max_length=10,default=0)
+    arrival_address_longitude = serializers.CharField(max_length=10, default=0)
+    arrival_address_latitude = serializers.CharField(max_length=10, default=0)
     payment_type = serializers.IntegerField(default=0)
 
     def validate(self, data):
@@ -212,11 +237,12 @@ class BookingSerializer(serializers.Serializer):
 
 
 
-
 ########################################
-########## TEST SERIALIZER
+# TEST SERIALIZER
 ########################################
 from datetime import datetime
+
+
 class TestClass(object):
     def __init__(self, email, content, created=None):
         self.email = email
@@ -224,8 +250,9 @@ class TestClass(object):
         self.created = created or datetime.now()
 
 
-
 from rest_framework.renderers import JSONRenderer
+
+
 class TESTSerializer(serializers.Serializer):
     email = serializers.EmailField()
     content = serializers.CharField(max_length=200)
@@ -236,7 +263,7 @@ class TESTSerializer(serializers.Serializer):
         print(type(validated_data))
 
         testClass = TestClass(email='ksk@example.com', content='TEST Content')
-        #return JSONRenderer().render(validated_data)
+        # return JSONRenderer().render(validated_data)
         return testClass
 
     def update(self, instance, validated_data):
@@ -245,11 +272,3 @@ class TESTSerializer(serializers.Serializer):
         instance.content = validated_data.get('content', instance.content)
         instance.created = validated_data.get('created', instance.created)
         return instance
-
-
-
-
-
-
-
-
