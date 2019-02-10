@@ -2,6 +2,7 @@
 ### Python ###
 __pycache__/
 api/migrations/
+api/migrations/0001_initial.py
 
 ### DB ### 
 db.sqlite3

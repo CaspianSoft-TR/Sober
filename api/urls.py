@@ -2,12 +2,14 @@ from django.urls import path
 from django.conf.urls import url
 from api import views
 from .views import (
-	CarListAPIView,
-	CarCreateAPIView,
+    CarListAPIView,
+    CarCreateAPIView,
     UserCarCreateAPIView,
     UserCarListAllAPIView,
-    UserCarDeleteAPIView
-	)
+    UserCarDeleteAPIView,
+    DriverIDView,
+    DriverLicenseView
+)
 
 urlpatterns = [
 
@@ -24,9 +26,12 @@ urlpatterns = [
     path('user/address/list/', views.UserAddressListAPIView.as_view() , name='user-address-list-owner'),
     path('user/address/list-all/', views.UserAddressListAllAPIView.as_view() , name='user-address-list-all'),
 
+    path('driver/add/NaID/', views.DriverIDView.as_view(), name='driver-add-NaID'),
+    path('driver/add/DrLicense/', views.DriverLicenseView.as_view(), name='driver-add-DrLicense'),
+
     path('booking/new', views.BookingCreateAPIView.as_view() , name='booking-new'),
     path('booking/list', views.BookingListAPIView.as_view() , name='booking-new'),
     path('booking/cancel/', views.BookingCancelAPIView.as_view() , name='booking-cancel'),
 
-    path('test', views.TestCreateAPIView.as_view() , name='test'),
+    path('test', views.TestCreateAPIView.as_view(), name='test'),
 ]
