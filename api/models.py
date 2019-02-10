@@ -19,7 +19,8 @@ class UserInfo(models.Model):
     is_driver = models.BooleanField(default=False)
     is_customer = models.BooleanField(default=True)
     phone = models.CharField(max_length=50)
-
+    longitude = models.CharField(max_length=10, default=0)
+    latitude = models.CharField(max_length=10, default=0)
     def __str__(self):
         return self.phone
 
@@ -29,8 +30,8 @@ class Driver(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     #vehicle = models.ForeignKey(Car, on_delete=models.CASCADE)
     phone = models.CharField(max_length=50)
-    national_id = models.ImageField(upload_to='sober/static/national_id')
-    driver_license = models.ImageField(upload_to='sober/static/driving_license')
+    national_id = models.ImageField(upload_to='sober/static/national_id',blank=True)
+    driver_license = models.ImageField(upload_to='sober/static/driving_license',blank=True)
 
     def __str__(self):
         return self.phone

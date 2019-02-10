@@ -23,11 +23,50 @@ from . import serializers
 from api.serializers import *
 
 
+
+########################################
+# USER SERVICES
+########################################
+
 class RegisterView(RegisterView):
     def get_serializer_class(self):
         return RegisterSerializer
 
 
+class UserLocationUpdateAPIView(APIView):
+    def get_queryset(self):
+        queryset = UserInfo.objects.filter(user=self.request.user.id)
+        return queryset
+
+    def put(self, request, format=None):
+        print(">>> >>> UserLocationUpdateAPIView put called")
+        userInfo = self.get_queryset()
+        print(type(userInfo))
+        result = {}
+        
+        if userInfo.count() == 0:
+            result["resultCode"] = 200
+            result["resultText"] = "SUCCESS_EMPTY"
+            result["content"] = "User Profile Not Found Error"
+        elif userInfo.count() > 1:
+            result["resultCode"] = 200
+            result["resultText"] = "FAILURE"
+            result["content"] = "Multiple User Profile Error"
+        else:
+            userProfile = userInfo.first()
+            userProfile.longitude = self.request.POST.get('longitude')
+            userProfile.latitude = self.request.POST.get('latitude')
+            userProfile.save()
+            result["resultCode"] = 100
+            result["resultText"] = "SUCCESS"
+            result["content"] = "User Location Updated"
+        
+        return JsonResponse(result)
+
+
+########################################
+# CAR SERVICES
+########################################
 class CarListAPIView(ListAPIView):
     queryset = Car.objects.all()
     serializer_class = CarSerializer

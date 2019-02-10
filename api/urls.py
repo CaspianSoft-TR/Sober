@@ -26,6 +26,8 @@ urlpatterns = [
     path('user/address/list/', views.UserAddressListAPIView.as_view() , name='user-address-list-owner'),
     path('user/address/list-all/', views.UserAddressListAllAPIView.as_view() , name='user-address-list-all'),
 
+    path('user/location/set/', views.UserLocationUpdateAPIView.as_view() , name='user-profile-set-location'),
+
     path('driver/add/NaID/', views.DriverIDView.as_view(), name='driver-add-NaID'),
     path('driver/add/DrLicense/', views.DriverLicenseView.as_view(), name='driver-add-DrLicense'),
 
