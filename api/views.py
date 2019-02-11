@@ -420,7 +420,35 @@ class BookingSearchDriverAPIView(APIView):
         return JsonResponse(result)
 
 
+"""
+    Servis sonucunda 'book' tablosunda sürücü update edilmiyor. (Müşteri, sürücüyü kabul etmesi durumunda driver_id set ediliyor )
 
+"""
+class BookingAcceptDriverAPIView(APIView):
+    def get_queryset(self):        
+        queryset = Booking.objects.filter(customer_id=self.request.user.id,id=self.request.POST.get('id'))
+        return queryset
+
+    def put(self, request, format=None):
+        print(">>> >>> BookingAcceptDriverAPIView put called")
+        bookList = self.get_queryset()
+        result = {}
+        if bookList.count() == 0:
+            result["resultCode"] = 200
+            result["resultText"] = "SUCCESS_EMPTY"
+            result["content"] = "Book Not Found Error"
+        elif bookList.count() > 1:
+            result["resultCode"] = 200
+            result["resultText"] = "FAILURE"
+            result["content"] = "Multiple Book Error"
+        else:
+            # get book from id 
+            book = bookList.first()
+            # get book pickup address
+            result["resultCode"] = 100
+            result["resultText"] = "SUCCESS"
+            result["content"] = "DENEME"
+        return JsonResponse(result)
 
 
 
@@ -435,8 +463,7 @@ class TestCreateAPIView(CreateAPIView):
     #permission_classes = (IsAdminUser,)
     #authentication_classes = (TokenAuthentication,)
 
-    def perform_create(self, serializer):
-
+    def perform_create(self, serializer):   
         print(">>> >>> TestCreateAPIView CALLED ")
         print(type(serializer))
 
