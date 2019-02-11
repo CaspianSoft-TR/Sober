@@ -1,14 +1,16 @@
 # Sober
 
 # To use this project follow these steps:
-1.Install Python and Project
-2.Create your working environment
-3.Install Django
-4.Install additional dependencies
+
+1. Install Python and Project
+2. Create your working environment
+3. Install Django
+4. Install additional dependencies
+5. Setup
 
 # Requirements
-Python 3.7.2
-Django==2.1.5
+- Python 3.7.2
+- Django==2.1.5
 # 1.Install Project
 ```
 git clone https://github.com/CaspianSoft-TR/Sober.git
@@ -28,16 +30,16 @@ $ source Name/bin/activate
 ```
 
 
-# Installing Django
+# 3.Installing Django
 ```
 $ pip install django
 ```
-# Installation of Dependencies
+# 4.Installation of Dependencies
 ```
 $ pip install -r requirement.txt
 ```
 
-# Setup
+# 5.Setup
 ```
 $ python manage.py makemigrations
 
