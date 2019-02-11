@@ -233,6 +233,10 @@ class BookingSerializer(serializers.Serializer):
         arrivalAddress.is_arrival_loc = True
         arrivalAddress.booking = newBook
         arrivalAddress.save()
+
+        # find nearest userInfo 
+        #nearestDriverUserInfo = findNearestDriver(latitude=pickupAddress.latitude , longitude=pickupAddress.longitude , filterMaxDistance=10000)
+        #newBook.driver = nearestDriverUserInfo.user
         return newBook
 
 
@@ -241,7 +245,6 @@ class BookingSerializer(serializers.Serializer):
 # TEST SERIALIZER
 ########################################
 from datetime import datetime
-
 
 class TestClass(object):
     def __init__(self, email, content, created=None):

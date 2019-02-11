@@ -35,5 +35,9 @@ urlpatterns = [
     path('booking/list', views.BookingListAPIView.as_view() , name='booking-new'),
     path('booking/cancel/', views.BookingCancelAPIView.as_view() , name='booking-cancel'),
 
+    path('booking/search-driver/', views.BookingSearchDriverAPIView.as_view() , name='booking-search-driver'),
+
+
+
     path('test', views.TestCreateAPIView.as_view(), name='test'),
 ]

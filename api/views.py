@@ -24,6 +24,52 @@ from api.serializers import *
 
 
 
+import googlemaps
+gmaps = googlemaps.Client(key='AIzaSyA2b8Zh0rzAJQjwDn0_CZ_tHdPXm6G2Sjs')
+
+def findNearestDriver(latitude , longitude , filterMaxDistance):
+    # -1- GET ALL PROPER DRIVERS & LOCATION
+    # -2- CALL GOOGLEMAPS API TO FIND DISTANCE
+    # -3- IF DISTANCE <= 5000 
+    userProfileList = UserInfo.objects.all()
+    driverList = userProfileList.filter(is_driver=True)
+
+    driverObjectList = []
+    destinations = ''
+    for driver in driverList:
+        if not(driver.longitude=='0' and driver.latitude=='0'):
+
+            if destinations == '':
+                destinations = driver.latitude + ',' + driver.longitude
+            else:
+                destinations = destinations + '|' + driver.latitude + ',' + driver.longitude
+
+            driverObjectList.append(driver)
+
+
+    minDistanceIndex = -1
+    minDistance = -1
+    distanceResult = gmaps.distance_matrix(origins= latitude+','+longitude,destinations=destinations)
+    for row in distanceResult['rows']:
+        elementIndex = 0
+        for element in row['elements']:
+            distance = element['distance']
+            if filterMaxDistance > distance['value']:
+                if minDistance==-1 or distance['value'] < minDistance:
+                    minDistance = distance['value']
+                    minDistanceIndex = elementIndex
+
+            elif distance['value'] >= minDistance:
+                print("ERROR >> Distance filter error")
+                        
+            elementIndex=elementIndex+1
+    return driverObjectList[minDistanceIndex]
+
+
+def getDriverPoint():
+    return 3
+
+
 ########################################
 # USER SERVICES
 ########################################
@@ -337,6 +383,49 @@ class BookingCancelAPIView(APIView):
         return JsonResponse(result)
 
 
+class BookingSearchDriverAPIView(APIView):
+    def get_queryset(self):        
+        queryset = Booking.objects.filter(customer_id=self.request.user.id,id=self.request.POST.get('id'))
+        return queryset
+
+
+    def put(self, request, format=None):
+        print(">>> >>> BookingSearchDriverAPIView put called")
+        bookList = self.get_queryset()
+        result = {}
+        if bookList.count() == 0:
+            result["resultCode"] = 200
+            result["resultText"] = "SUCCESS_EMPTY"
+            result["content"] = "Book Not Found Error"
+        elif bookList.count() > 1:
+            result["resultCode"] = 200
+            result["resultText"] = "FAILURE"
+            result["content"] = "Multiple Book Error"
+        else:
+            # get book from id 
+            book = bookList.first()
+            # get book pickup address
+            address = Address.objects.filter(is_pickup_loc=1,booking_id=book.id).first()    
+            nearestDriverUserInfo = findNearestDriver(address.latitude , address.longitude ,10000)
+            book.status = 10
+            book.save()
+            result["resultCode"] = 100
+            result["resultText"] = "SUCCESS"
+            result["content"] = { 
+                    'userId': nearestDriverUserInfo.user.id ,
+                    'driverName' : nearestDriverUserInfo.user.username , 
+                    'phone' : nearestDriverUserInfo.phone,
+                    'rate' : getDriverPoint()
+                }
+        return JsonResponse(result)
+
+
+
+
+
+
+
+
 ########################################
 # TEST TEST TEST
 ########################################
@@ -347,6 +436,7 @@ class TestCreateAPIView(CreateAPIView):
     #authentication_classes = (TokenAuthentication,)
 
     def perform_create(self, serializer):
+
         print(">>> >>> TestCreateAPIView CALLED ")
         print(type(serializer))
 
@@ -357,3 +447,4 @@ class TestCreateAPIView(CreateAPIView):
         result["resultText"] = "SUCCESS"
         result["content"] = serializer.data
         return JsonResponse(result)
+
