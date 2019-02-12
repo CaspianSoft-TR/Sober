@@ -28,6 +28,7 @@ urlpatterns = [
 
     path('user/book/accept-user/', views.BookingAcceptDriverAPIView.as_view() , name='user-book-accept-driver'),
     path('user/location/set/', views.UserLocationUpdateAPIView.as_view() , name='user-profile-set-location'),
+    path('user/update/firebase-token/', views.UserFirebaseTokenUpdateAPIView.as_view() , name='user-firebase-token-set'),
 
     path('driver/add/NaID/', views.DriverIDView.as_view(), name='driver-add-NaID'),
     path('driver/add/DrLicense/', views.DriverLicenseView.as_view(), name='driver-add-DrLicense'),

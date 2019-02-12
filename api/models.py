@@ -21,6 +21,7 @@ class UserInfo(models.Model):
     phone = models.CharField(max_length=50)
     longitude = models.CharField(max_length=10, default=0)
     latitude = models.CharField(max_length=10, default=0)
+    firebase_token = models.CharField(max_length=255, default="")
     def __str__(self):
         return self.phone
 
