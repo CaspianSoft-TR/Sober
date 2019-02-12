@@ -390,8 +390,9 @@ class BookingSearchDriverAPIView(APIView):
             # get book from id 
             book = bookList.first()
             # get book pickup address
+            properDriverList = utils.findProperDrivers(book.id)
             address = Address.objects.filter(is_pickup_loc=1,booking_id=book.id).first()    
-            nearestDriverUserInfo = utils.findNearestDriver(address.latitude , address.longitude ,10000)
+            nearestDriverUserInfo = utils.findNearestDriver(address.latitude , address.longitude ,10000 , properDriverList)
             book.driver = nearestDriverUserInfo.user
             book.status = 10
             book.save()
@@ -465,13 +466,35 @@ class BookingAcceptDriverAPIView(APIView):
                 result["resultText"] = "SUCCESS"
                 result["content"] = "Trip started..."
 
-            # Driver Rejected Case
+            # -3- Driver Rejected Case
             else :
+                # -3.1-
                 book.status = 2
                 book.save()
+
+                # -3.2-
+                bookDriver = BookDriver()
+                bookDriver.driver = User.objects.get(id=book.driver.id)
+                bookDriver.book = book
+                bookDriver.save()
+
+                # -3.3-
+                # BURADA YENI DRIVER BULUNUP RETURN EDILMELIDIR
+                # UYARI UYARI UYARI
+                properDriverList = utils.findProperDrivers(book.id)
+                address = Address.objects.filter(is_pickup_loc=1,booking_id=book.id).first()    
+                nearestDriverUserInfo = utils.findNearestDriver(address.latitude , address.longitude ,10000 , properDriverList)
+                book.driver = nearestDriverUserInfo.user
+                book.save()
+
                 result["resultCode"] = 100
                 result["resultText"] = "SUCCESS"
-                result["content"] = "DRIVER REJECTED >> NEW DRIVER SEARCHED... "
+                result["content"] = { 
+                    'userId': nearestDriverUserInfo.user.id ,
+                    'driverName' : nearestDriverUserInfo.user.username , 
+                    'phone' : nearestDriverUserInfo.phone,
+                    'rate' : utils.getDriverPoint()
+                }
             
         return JsonResponse(result)
 

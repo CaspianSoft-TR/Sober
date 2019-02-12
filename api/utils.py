@@ -29,16 +29,42 @@ def send_notification(token , messageTitle, messageBody):
 
 
 """
+    This function returns proper drivers for given book
+    IMPROPER DRIVER CONDITIONS 
+        >> rejected driver
+        >> working in different book
+        >> book owner
+"""
+def findProperDrivers(bookId):
+
+    # REJECTED USERS
+    improperDriverIdList = []
+    for bookDriver in BookDriver.objects.all().filter(book_id=bookId):
+        improperDriverIdList.append(bookDriver.driver.id)
+
+    # WORKING DRIVER 
+    for book in Booking.objects.all().filter(status=1):
+        improperDriverIdList.append(book.driver.id)    
+
+    # BOOK OWNER
+    improperDriverIdList.append(Booking.objects.get(id=bookId).customer.id)
+
+    userProfileList = UserInfo.objects.all()
+    driverList = userProfileList.filter(is_driver=True).exclude(user_id__in=improperDriverIdList)
+
+    return driverList
+
+
+
+"""
 	This function searches nearest drivers by latitude & longitude
 """
-def findNearestDriver(latitude , longitude , filterMaxDistance):
+def findNearestDriver(latitude , longitude , filterMaxDistance , driverList):
 
+    # -1- GET ALL PROPER DRIVERS & PREPARE DESTINATION STRING
     gmaps = googlemaps.Client(key='AIzaSyA2b8Zh0rzAJQjwDn0_CZ_tHdPXm6G2Sjs')
-    # -1- GET ALL PROPER DRIVERS & LOCATION
-    # -2- CALL GOOGLEMAPS API TO FIND DISTANCE
-    # -3- IF DISTANCE <= 5000 
-    userProfileList = UserInfo.objects.all()
-    driverList = userProfileList.filter(is_driver=True)
+    #userProfileList = UserInfo.objects.all()
+    #driverList = userProfileList.filter(is_driver=True)
 
     driverObjectList = []
     destinations = ''
@@ -53,6 +79,7 @@ def findNearestDriver(latitude , longitude , filterMaxDistance):
             driverObjectList.append(driver)
 
 
+    # -2- CALL GOOGLEMAPS API TO FIND DISTANCE
     minDistanceIndex = -1
     minDistance = -1
     distanceResult = gmaps.distance_matrix(origins= latitude+','+longitude,destinations=destinations)
@@ -70,6 +97,7 @@ def findNearestDriver(latitude , longitude , filterMaxDistance):
                         
             elementIndex=elementIndex+1
     return driverObjectList[minDistanceIndex]
+
 
 
 """
