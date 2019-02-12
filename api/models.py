@@ -9,7 +9,6 @@ class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(default=None, blank=True, null=True)
-
     class Meta:
         abstract = True
 
@@ -70,7 +69,7 @@ class UserCar(BaseModel):
 class Booking(BaseModel):
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='customer_id')
     driver = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='driver_id')
-    status = models.IntegerField(choices=((0, 'NEW'), (1, 'ACCEPTED'), (2, 'REJECTED'), (100, 'CANCEL')), default=0)
+    status = models.IntegerField(choices=((0, 'NEW'), (1, 'ACCEPTED'), (2, 'REJECTED'), (10, 'DRIVER_RECOMENDED'), (100, 'CANCEL')), default=0)
     payment_type = models.IntegerField(choices=((0, 'CASH'), (1, 'CREDIT CARD')), default=0)
     driver_rate = models.IntegerField(null=True, validators=[MaxValueValidator(5), MinValueValidator(0)])
 
@@ -87,9 +86,16 @@ class Address(models.Model):
     latitude = models.CharField(max_length=10, default=0)
     is_pickup_loc = models.BooleanField(default=False)
     is_arrival_loc = models.BooleanField(default=False)
-
     def __str__(self):
         return 'address'
+
+
+class BookDriver(BaseModel):
+    driver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookdriver_user_id')
+    book = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name='bookdriver_book_id')
+    status = models.IntegerField(choices=((0, 'REJECTED'),(1, 'REJECTED')), default=0)
+    def __str__(self):
+        return 'Rejected Book Drivers'
 
 
 ###

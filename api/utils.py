@@ -1,7 +1,7 @@
 
 import requests 
 import googlemaps
-
+from api.models import *
 
 """
 	This function send notifications to given token devices

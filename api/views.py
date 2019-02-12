@@ -20,9 +20,10 @@ from rest_framework import viewsets, status
 from rest_auth.registration.views import RegisterView
 from . import models
 from . import serializers
-from api.serializers import *
-
 from . import utils 
+from api.serializers import *
+from api.models import *
+import uuid
 
 
 ########################################
@@ -391,6 +392,7 @@ class BookingSearchDriverAPIView(APIView):
             # get book pickup address
             address = Address.objects.filter(is_pickup_loc=1,booking_id=book.id).first()    
             nearestDriverUserInfo = utils.findNearestDriver(address.latitude , address.longitude ,10000)
+            book.driver = nearestDriverUserInfo.user
             book.status = 10
             book.save()
             result["resultCode"] = 100
@@ -399,7 +401,7 @@ class BookingSearchDriverAPIView(APIView):
                     'userId': nearestDriverUserInfo.user.id ,
                     'driverName' : nearestDriverUserInfo.user.username , 
                     'phone' : nearestDriverUserInfo.phone,
-                    'rate' : getDriverPoint()
+                    'rate' : utils.getDriverPoint()
                 }
         return JsonResponse(result)
 
@@ -407,13 +409,13 @@ class BookingSearchDriverAPIView(APIView):
 """
     Servis sonucunda 'book' tablosunda sürücü update edilmiyor. (Müşteri, sürücüyü kabul etmesi durumunda driver_id set ediliyor )
 """
+import json
 class BookingAcceptDriverAPIView(APIView):
     def get_queryset(self):        
-        queryset = Booking.objects.filter(customer_id=self.request.user.id,id=self.request.POST.get('id'))
+        queryset = Booking.objects.filter(customer_id=self.request.user.id,id=self.request.POST.get('book_id'))
         return queryset
 
     def put(self, request, format=None):
-        print(">>> >>> BookingAcceptDriverAPIView put called")
         bookList = self.get_queryset()
         result = {}
         if bookList.count() == 0:
@@ -425,12 +427,52 @@ class BookingAcceptDriverAPIView(APIView):
             result["resultText"] = "FAILURE"
             result["content"] = "Multiple Book Error"
         else:
-            # get book from id 
+
+            # -1-   'accept' parametresi alınır
+            # -2-   'accept' == True ise
+            # -2.1- booking status değeri kabul edildi olarak değiştirilir
+            # -2.2- socket.io için unique room id oluşturulur
+            # -2.3- room id, notification ile müşteri ve sürücüye yollanır 
+
+            # -3-   'accept' == False ise 
+            # -3.1- booking status değeri reddedildi olarak değiştirilir
+            # -3.2- driver id değeri book id ile "book_rejected_driver" tablosuna atılır
+            # -3.3- reddedilmemiş yeni bir sürücü aranır ve result olarak bu sürücü belirtilir
+
+            # -4-   RESULT dönülür
+
+            
             book = bookList.first()
-            # get book pickup address
-            result["resultCode"] = 100
-            result["resultText"] = "SUCCESS"
-            result["content"] = "DENEME"
+            # Driver Accepted Case
+            acceptDriver = int(request.POST.get('accept'))
+            if acceptDriver == 1:
+                book.status = 1
+                uniqueRoomID = uuid.uuid4()
+                driverUserInfo = UserInfo.objects.get(user_id=book.driver.id)
+                customerUserInfo = UserInfo.objects.get(user_id=self.request.user.id)
+
+                # BURADA FIREBASE KONTROLU YAPILMALI
+                # CUSTOMER & DRIVER room almış olmalılar
+                firebaseResult = utils.send_notification(driverUserInfo.firebase_token , "BOOKING Room ID >> DRIVER" , str(uniqueRoomID))
+                print("--------------- FIREBASE NOTIFICATION ---------------")
+                print(json.loads(firebaseResult.text))
+                firebaseResult = utils.send_notification(customerUserInfo.firebase_token , "BOOKING Room ID >> CUSTOMER" , str(uniqueRoomID))
+                print("--------------- FIREBASE NOTIFICATION ---------------")
+                print(json.loads(firebaseResult.text))
+                book.save()
+
+                result["resultCode"] = 100
+                result["resultText"] = "SUCCESS"
+                result["content"] = "Trip started..."
+
+            # Driver Rejected Case
+            else :
+                book.status = 2
+                book.save()
+                result["resultCode"] = 100
+                result["resultText"] = "SUCCESS"
+                result["content"] = "DRIVER REJECTED >> NEW DRIVER SEARCHED... "
+            
         return JsonResponse(result)
 
 
