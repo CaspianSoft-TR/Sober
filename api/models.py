@@ -69,13 +69,23 @@ class UserCar(BaseModel):
 class Booking(BaseModel):
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='customer_id')
     driver = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='driver_id')
-    status = models.IntegerField(choices=((0, 'NEW'), (1, 'ACCEPTED'), (2, 'REJECTED'), (10, 'DRIVER_RECOMENDED'), (100, 'CANCEL')), default=0)
+    status = models.IntegerField(choices=(
+            (0, 'NEW'), 
+            (1, 'ACCEPTED'), 
+            (2, 'REJECTED'), 
+            (10, 'DRIVER_RECOMENDED'), 
+            (100, 'CANCEL'),
+            (200, 'COMPLETED')
+        ), default=0)
     payment_type = models.IntegerField(choices=((0, 'CASH'), (1, 'CREDIT CARD')), default=0)
     driver_rate = models.IntegerField(null=True, validators=[MaxValueValidator(5), MinValueValidator(0)])
 
     def __str__(self):
         return 'Booking from #{}'.format(self.customer.username)
 
+    def setStatusToComplete(self):
+        self.status = 200
+        
 
 class Address(models.Model):
     booking = models.ForeignKey(Booking, null=True, on_delete=models.CASCADE, related_name='booking_id')

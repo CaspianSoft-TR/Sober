@@ -25,7 +25,6 @@ urlpatterns = [
     path('user/address/delete/<int:pk>/', views.UserAddressDeleteAPIView.as_view() , name='user-address-delete'),
     path('user/address/list/', views.UserAddressListAPIView.as_view() , name='user-address-list-owner'),
     path('user/address/list-all/', views.UserAddressListAllAPIView.as_view() , name='user-address-list-all'),
-
     path('user/book/accept-user/', views.BookingAcceptDriverAPIView.as_view() , name='user-book-accept-driver'),
     path('user/location/set/', views.UserLocationUpdateAPIView.as_view() , name='user-profile-set-location'),
     path('user/update/firebase-token/', views.UserFirebaseTokenUpdateAPIView.as_view() , name='user-firebase-token-set'),
@@ -36,8 +35,8 @@ urlpatterns = [
     path('booking/new', views.BookingCreateAPIView.as_view() , name='booking-new'),
     path('booking/list', views.BookingListAPIView.as_view() , name='booking-new'),
     path('booking/cancel/', views.BookingCancelAPIView.as_view() , name='booking-cancel'),
-
     path('booking/search-driver/', views.BookingSearchDriverAPIView.as_view() , name='booking-search-driver'),
+    path('booking/completed/', views.BookingCompletedAPIView.as_view() , name='booking-completed'),
 
 
 
