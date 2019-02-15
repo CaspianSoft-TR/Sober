@@ -527,6 +527,51 @@ class BookingCompletedAPIView(APIView):
         return JsonResponse(result)
 
 
+# "book_id" her ne kadar gerekmese de veritabanında kontrol amacıyla konulmuştur 
+class BookingDriverRateAPIView(APIView):
+    def get_queryset(self):        
+        queryset = Booking.objects.filter(customer_id=self.request.user.id,id=self.request.POST.get('book_id'),status=200)
+        return queryset
+
+    # update driver rate 
+    def post(self, request, format=None):
+        print(">>> >>> BookingDriverRateAPIView put called")
+        bookList = self.get_queryset()
+        result = {}
+        if bookList.count() == 0:
+            result["resultCode"] = 200
+            result["resultText"] = "SUCCESS_EMPTY"
+            result["content"] = "Book Not Found Error"
+        elif bookList.count() > 1:
+            result["resultCode"] = 200
+            result["resultText"] = "FAILURE"
+            result["content"] = "Multiple Book Error"
+        else:
+            book = bookList.first()
+            if book.driver_rate==0:
+
+                if int(self.request.POST.get('rate'))>5:
+                    book.driver_rate = 5
+                elif int(self.request.POST.get('rate'))<1:
+                    book.driver_rate = 1
+                else:
+                    book.driver_rate = int(self.request.POST.get('rate'))
+
+                book.save()
+                result["resultCode"] = 100
+                result["resultText"] = "SUCCESS"
+                result["content"] = { 
+                        'book_status': 'update driver rate'
+                    }
+            else:
+                result["resultCode"] = 200
+                result["resultText"] = "FAILURE"
+                result["content"] = { 
+                        'desc': 'Cant rate multiple times'
+                    }
+        return JsonResponse(result)
+
+
 ########################################
 # TEST TEST TEST
 ########################################

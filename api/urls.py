@@ -37,6 +37,7 @@ urlpatterns = [
     path('booking/cancel/', views.BookingCancelAPIView.as_view() , name='booking-cancel'),
     path('booking/search-driver/', views.BookingSearchDriverAPIView.as_view() , name='booking-search-driver'),
     path('booking/completed/', views.BookingCompletedAPIView.as_view() , name='booking-completed'),
+    path('booking/driver/rate/', views.BookingDriverRateAPIView.as_view() , name='booking-driver-rate'),
 
 
 
