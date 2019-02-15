@@ -33,7 +33,7 @@ urlpatterns = [
     path('driver/add/DrLicense/', views.DriverLicenseView.as_view(), name='driver-add-DrLicense'),
 
     path('booking/new', views.BookingCreateAPIView.as_view() , name='booking-new'),
-    path('booking/list', views.BookingListAPIView.as_view() , name='booking-new'),
+    path('booking/list', views.BookingListAPIView.as_view() , name='booking-list'),
     path('booking/cancel/', views.BookingCancelAPIView.as_view() , name='booking-cancel'),
     path('booking/search-driver/', views.BookingSearchDriverAPIView.as_view() , name='booking-search-driver'),
     path('booking/completed/', views.BookingCompletedAPIView.as_view() , name='booking-completed'),
