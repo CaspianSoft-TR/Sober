@@ -304,6 +304,13 @@ class BookingCreateAPIView(CreateAPIView):
         result["content"] = serializer.data
         return JsonResponse(result)
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        #headers = self.get_success_headers(serializer.data)
+        #return Response({'Message': 'You have successfully register'}, status=status.HTTP_201_CREATED, headers=headers)
+        return self.perform_create(serializer)        
+
 
 class BookingListAPIView(ListAPIView):
     queryset = Booking.objects.all()

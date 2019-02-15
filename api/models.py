@@ -79,6 +79,10 @@ class Booking(BaseModel):
         ), default=0)
     payment_type = models.IntegerField(choices=((0, 'CASH'), (1, 'CREDIT CARD')), default=0)
     driver_rate = models.IntegerField(validators=[MaxValueValidator(5), MinValueValidator(0)],default=0)
+    total_distance = models.IntegerField(default=0)
+    total_distance_type = models.IntegerField(choices=((0, 'KM'), (1, 'MILES')),default=0)
+    price = models.IntegerField(default=0)
+    price_currency = models.IntegerField(choices=((1, 'AZN'), (2, 'TL')),default=1)
 
     def __str__(self):
         return 'Booking from #{}'.format(self.customer.username)

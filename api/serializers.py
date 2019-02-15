@@ -204,6 +204,8 @@ class BookingSerializer(serializers.Serializer):
     arrival_address_longitude = serializers.CharField(max_length=10, default=0)
     arrival_address_latitude = serializers.CharField(max_length=10, default=0)
     payment_type = serializers.IntegerField(default=0)
+    price = serializers.IntegerField(default=0)
+    distance = serializers.IntegerField(default=0)
 
     def validate(self, data):
         if data['payment_type'] < 0 and data['payment_type'] > 1:
@@ -214,6 +216,8 @@ class BookingSerializer(serializers.Serializer):
         newBook = Booking()
         newBook.customer = request.user
         newBook.payment_type = request.POST.get("payment_type")
+        newBook.price = request.POST.get("price")
+        newBook.total_distance = request.POST.get("total_distance")
         newBook.save()
 
         pickupAddress = Address()
