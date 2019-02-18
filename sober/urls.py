@@ -32,6 +32,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^', include(router.urls)),
 
+   # url(r'^node_api$', 'api.views.node_api', name='node_api'),
+
     # MAIN DIRECTORY
     url(r'^docs/', include_docs_urls(title=API_TITLE, description=API_DESCRIPTION)),
     path('api/v1/', include('api.urls')),
