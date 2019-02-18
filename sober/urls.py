@@ -21,6 +21,7 @@ from rest_framework.documentation import include_docs_urls
 from rest_framework import routers, serializers, viewsets
 from api import views
 from api.views import RegisterView
+from rest_framework_jwt.views import obtain_jwt_token
 
 router = routers.DefaultRouter()
 #router.register(r'users', views.UserViewSet)
@@ -32,7 +33,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^', include(router.urls)),
 
-   # url(r'^node_api$', 'api.views.node_api', name='node_api'),
+    # url(r'^node_api$', 'api.views.node_api', name='node_api'),
 
     # MAIN DIRECTORY
     url(r'^docs/', include_docs_urls(title=API_TITLE, description=API_DESCRIPTION)),
@@ -45,5 +46,9 @@ urlpatterns = [
 
     # CUSTOM REGISTER DIRECTORY - it will remove
     url(r'^rest-auth/register/create/$', RegisterView.as_view(), name='custom-register'),
+
+    ##########JWT login 
+    #url(r'^api-token-auth/', obtain_jwt_token),
+
 
 ]

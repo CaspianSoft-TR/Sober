@@ -81,7 +81,7 @@ WSGI_APPLICATION = 'sober.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -92,8 +92,8 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-
 '''
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -104,7 +104,7 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -152,7 +152,6 @@ STATICFILES_DIRS = [
 SITE_ID = 1
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-
 # REST Framework
 # https://www.django-rest-framework.org/
 REST_FRAMEWORK = {
@@ -168,7 +167,18 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 }
 
-
+''' JWT Settings 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+'''
 # REST Registration
 # https://pypi.org/project/django-rest-registration/
 REST_REGISTRATION = {

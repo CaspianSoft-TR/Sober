@@ -19,6 +19,8 @@ from api.models import (
 )
 
 
+###########################################################
+
 class UserSerializer(UserDetailsSerializer):
     phone = serializers.CharField(source="userinfo.phone")
 
@@ -238,7 +240,7 @@ class BookingSerializer(serializers.Serializer):
         arrivalAddress.booking = newBook
         arrivalAddress.save()
 
-        # find nearest userInfo 
+        # find nearest userInfo
         #nearestDriverUserInfo = findNearestDriver(latitude=pickupAddress.latitude , longitude=pickupAddress.longitude , filterMaxDistance=10000)
         #newBook.driver = nearestDriverUserInfo.user
         return newBook
@@ -249,6 +251,7 @@ class BookingSerializer(serializers.Serializer):
 # TEST SERIALIZER
 ########################################
 from datetime import datetime
+
 
 class TestClass(object):
     def __init__(self, email, content, created=None):
