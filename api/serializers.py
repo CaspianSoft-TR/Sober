@@ -139,11 +139,14 @@ class RegisterSerializer(serializers.Serializer):
         # print(user)
         return user
 
-#Verify Email
+# Verify Email
+
+
 class VerifyEmailSerializer(serializers.Serializer):
     key = serializers.CharField()
 
 ###############################################################################
+
 
 class CarDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -208,8 +211,8 @@ class BookingSerializer(serializers.Serializer):
     pickup_address_latitude = serializers.CharField(max_length=10, default=0)
     arrival_address_title = serializers.CharField(max_length=50)
     arrival_address_description = serializers.CharField(max_length=50)
-    arrival_address_longitude = serializers.CharField(max_length=10, default=0)
-    arrival_address_latitude = serializers.CharField(max_length=10, default=0)
+    arrival_address_longitude = serializers.CharField(max_length=30, default=0)
+    arrival_address_latitude = serializers.CharField(max_length=30, default=0)
     payment_type = serializers.IntegerField(default=0)
     price = serializers.IntegerField(default=0)
     distance = serializers.IntegerField(default=0)
