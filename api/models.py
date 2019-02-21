@@ -25,8 +25,8 @@ class UserInfo(models.Model):
     is_driver = models.BooleanField(default=False)
     is_customer = models.BooleanField(default=True)
     phone = models.CharField(max_length=50)
-    longitude = models.CharField(max_length=10, default=0)
-    latitude = models.CharField(max_length=10, default=0)
+    longitude = models.CharField(max_length=30, default=0)
+    latitude = models.CharField(max_length=30, default=0)
     firebase_token = models.CharField(max_length=255, default="")
     verified_at = models.DateTimeField(auto_now_add=True)
 
