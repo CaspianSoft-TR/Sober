@@ -126,8 +126,8 @@ class BookDriver(BaseModel):
 ###
 class DriverLocation (models.Model):
     driver_id = models.ForeignKey(Driver, on_delete=models.CASCADE)
-    longitude = models.CharField(max_length=10)
-    latitude = models.CharField(max_length=10)
+    longitude = models.CharField(max_length=30)
+    latitude = models.CharField(max_length=30)
     location_name = models.CharField(max_length=20)
     #category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
