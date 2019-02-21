@@ -139,6 +139,11 @@ class RegisterSerializer(serializers.Serializer):
         # print(user)
         return user
 
+#Verify Email
+class VerifyEmailSerializer(serializers.Serializer):
+    key = serializers.CharField()
+
+###############################################################################
 
 class CarDetailSerializer(serializers.ModelSerializer):
     class Meta:
