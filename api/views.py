@@ -17,7 +17,9 @@ from rest_framework.generics import (
 )
 from rest_framework.views import APIView
 from rest_framework import viewsets, status
-from rest_auth.registration.views import RegisterView,VerifyEmailSerializer,
+from rest_auth.registration.views import (
+    RegisterView,
+    VerifyEmailSerializer,)
 from . import models
 from . import serializers
 from . import utils 
