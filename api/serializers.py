@@ -207,8 +207,8 @@ class BookingAddressSerializer(serializers.ListSerializer):
 class BookingSerializer(serializers.Serializer):
     pickup_address_title = serializers.CharField(max_length=50)
     pickup_address_description = serializers.CharField(max_length=50)
-    pickup_address_longitude = serializers.CharField(max_length=10, default=0)
-    pickup_address_latitude = serializers.CharField(max_length=10, default=0)
+    pickup_address_longitude = serializers.CharField(max_length=30, default=0)
+    pickup_address_latitude = serializers.CharField(max_length=30, default=0)
     arrival_address_title = serializers.CharField(max_length=50)
     arrival_address_description = serializers.CharField(max_length=50)
     arrival_address_longitude = serializers.CharField(max_length=30, default=0)
