@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'rest_framework',
     'rest_framework.authtoken',
+    'drfpasswordless',
     #'rest_registration',
     'rest_auth',
     'rest_auth.registration',
@@ -155,10 +156,13 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # REST Framework
 # https://www.django-rest-framework.org/
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ),
+
+    #  'DEFAULT_PERMISSION_CLASSES': (
+    # 'rest_framework.permissions.IsAuthenticated',
+    # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    #'rest_framework.permissions.IsAdminUser'
+    # ),
+
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
         #'rest_framework.authentication.SessionAuthentication',
@@ -167,6 +171,14 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 }
 
+PASSWORDLESS_AUTH = {
+
+    'PASSWORDLESS_AUTH_TYPES': ['EMAIL'],
+    'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': 'musadiq.aliyev@gmail.com',
+    'PASSWORDLESS_USER_MARK_EMAIL_VERIFIED': False,
+    'PASSWORDLESS_USER_EMAIL_VERIFIED_FIELD_NAME': 'email_verified',
+
+}
 ''' JWT Settings 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -198,3 +210,9 @@ try:
     from .local_settings import *
 except ImportError:
     pass
+
+MAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'musadiq.aliyev@gmail.com'
+EMAIL_HOST_PASSWORD = 'Musadiq1234'

@@ -46,8 +46,9 @@ urlpatterns = [
 
     # CUSTOM REGISTER DIRECTORY - it will remove
     url(r'^rest-auth/register/create/$', RegisterView.as_view(), name='custom-register'),
+    path('', include('drfpasswordless.urls')),
 
-    ##########JWT login 
+    # JWT login
     #url(r'^api-token-auth/', obtain_jwt_token),
 
 
