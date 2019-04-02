@@ -82,19 +82,19 @@ WSGI_APPLICATION = 'sober.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'django',
-        'USER': 'root',
-        'PASSWORD': 'root',
+        'USER': 'developer', #'root',
+        'PASSWORD': 'cs4204747o@', #'root',
         'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'PORT': '3307', #'3306',
     }
 }
-'''
 
+
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -105,6 +105,9 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+'''
+
+
 '''
 DATABASES = {
     'default': {

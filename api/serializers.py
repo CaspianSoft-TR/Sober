@@ -205,6 +205,8 @@ class BookingAddressSerializer(serializers.ListSerializer):
 
 
 class BookingSerializer(serializers.Serializer):
+
+    id = serializers.SerializerMethodField()
     pickup_address_title = serializers.CharField(max_length=50)
     pickup_address_description = serializers.CharField(max_length=50)
     pickup_address_longitude = serializers.CharField(max_length=30, default=0)
@@ -216,6 +218,9 @@ class BookingSerializer(serializers.Serializer):
     payment_type = serializers.IntegerField(default=0)
     price = serializers.IntegerField(default=0)
     distance = serializers.IntegerField(default=0)
+
+    def get_id(self, obj):
+        return self.validated_data['book_id']
 
     def validate(self, data):
         if data['payment_type'] < 0 and data['payment_type'] > 1:
@@ -229,6 +234,7 @@ class BookingSerializer(serializers.Serializer):
         newBook.price = request.POST.get("price")
         newBook.total_distance = request.POST.get("total_distance")
         newBook.save()
+        self.validated_data['book_id'] = newBook.id
 
         pickupAddress = Address()
         pickupAddress.title = request.POST.get("pickup_address_title")

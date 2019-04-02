@@ -209,7 +209,7 @@ class UserAddressListAPIView(ListAPIView):
         result = {}
         result["resultCode"] = 100
         result["resultText"] = "SUCCESS"
-        result["content"] = serializer.data
+        result["content"] = serializer
         return JsonResponse(result)
 
 
@@ -407,6 +407,8 @@ class BookingSearchDriverAPIView(APIView):
             result["content"] = { 
                     'userId': nearestDriverUserInfo.user.id ,
                     'driverName' : nearestDriverUserInfo.user.username , 
+                    'latitude' : nearestDriverUserInfo.latitude,
+                    'longitude' : nearestDriverUserInfo.longitude,
                     'phone' : nearestDriverUserInfo.phone,
                     'rate' : utils.getDriverPoint()
                 }

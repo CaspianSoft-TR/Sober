@@ -62,7 +62,7 @@ def findProperDrivers(bookId):
 def findNearestDriver(latitude , longitude , filterMaxDistance , driverList):
 
     # -1- GET ALL PROPER DRIVERS & PREPARE DESTINATION STRING
-    gmaps = googlemaps.Client(key='AIzaSyA2b8Zh0rzAJQjwDn0_CZ_tHdPXm6G2Sjs')
+    gmaps = googlemaps.Client(key='AIzaSyCePDBwi9tD1JrHm-qNvac8ScYq7roBUCI')
     #userProfileList = UserInfo.objects.all()
     #driverList = userProfileList.filter(is_driver=True)
 
