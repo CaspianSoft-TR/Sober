@@ -23,9 +23,11 @@ from api.models import (
 
 class UserSerializer(UserDetailsSerializer):
     phone = serializers.CharField(source="userinfo.phone")
+    is_driver = serializers.BooleanField(source="userinfo.is_driver")
+    is_customer = serializers.BooleanField(source="userinfo.is_customer")
 
     class Meta(UserDetailsSerializer.Meta):
-        fields = UserDetailsSerializer.Meta.fields + ('phone',)
+        fields = UserDetailsSerializer.Meta.fields + ('phone','is_driver', 'is_customer')
 
     def update(self, instance, validated_data):
         print("DENEME")
