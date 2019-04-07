@@ -96,27 +96,19 @@ DATABASES = {
 }
 '''
 
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.mysql',
+        'OPTIONS': {
+            'sql_mode': 'traditional',
+        },
         'NAME': 'sober',
-        'USER': 'postgres',
-        'PASSWORD': 'musadiq',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'USER': 'sober', 
+        'PASSWORD': 'CS20132015o@', 
+        'HOST': '160.153.204.5',
+        'PORT': '3306', 
     }
 }
-
-
-'''
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-'''
 
 
 # Password validation

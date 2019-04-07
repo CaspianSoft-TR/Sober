@@ -402,6 +402,9 @@ class BookingSearchDriverAPIView(APIView):
             book.driver = nearestDriverUserInfo.user
             book.status = 10
             book.save()
+            uniqueRoomID = uuid.uuid4()
+            firebaseResult = utils.send_notification(nearestDriverUserInfo.firebase_token , "BOOKING Room ID >> DRIVER" , str(uniqueRoomID))
+            print("--------------- FIREBASE NOTIFICATION ---------------")
             result["resultCode"] = 100
             result["resultText"] = "SUCCESS"
             result["content"] = { 
