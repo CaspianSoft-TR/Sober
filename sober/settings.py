@@ -24,7 +24,7 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 SECRET_KEY = '!-rype8$$jtiphg=^yg3hdl2^#5+p@0yw3++=v$$)34@5(%4a8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # ALLOW ALL HOSTS
 ALLOWED_HOSTS = ['*']
@@ -96,6 +96,7 @@ DATABASES = {
 }
 '''
 
+# Remote server 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -109,7 +110,6 @@ DATABASES = {
         'PORT': '3306', 
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

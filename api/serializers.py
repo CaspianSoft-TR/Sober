@@ -210,11 +210,11 @@ class BookingSerializer(serializers.Serializer):
 
     id = serializers.SerializerMethodField()
     pickup_address_title = serializers.CharField(max_length=50)
-    pickup_address_description = serializers.CharField(max_length=50)
+    pickup_address_description = serializers.CharField(max_length=200)
     pickup_address_longitude = serializers.CharField(max_length=30, default=0)
     pickup_address_latitude = serializers.CharField(max_length=30, default=0)
     arrival_address_title = serializers.CharField(max_length=50)
-    arrival_address_description = serializers.CharField(max_length=50)
+    arrival_address_description = serializers.CharField(max_length=200)
     arrival_address_longitude = serializers.CharField(max_length=30, default=0)
     arrival_address_latitude = serializers.CharField(max_length=30, default=0)
     payment_type = serializers.IntegerField(default=0)
