@@ -399,8 +399,9 @@ class BookingSearchDriverAPIView(APIView):
             book = bookList.first()
             # get book pickup address
             properDriverList = utils.findProperDrivers(book.id)
-            address = Address.objects.filter(is_pickup_loc=1,booking_id=book.id).first()    
-            nearestDriverUserInfo = utils.findNearestDriver(address.latitude , address.longitude ,10000 , properDriverList)
+            pickupAddress = Address.objects.filter(is_pickup_loc=1,booking_id=book.id).first() 
+            dropOffAddress = Address.objects.filter(is_pickup_loc=0,booking_id=book.id).first()       
+            nearestDriverUserInfo = utils.findNearestDriver(pickupAddress.latitude , pickupAddress.longitude ,10000 , properDriverList)
             book.driver = nearestDriverUserInfo.user
             book.status = 10
             book.save()
@@ -416,12 +417,20 @@ class BookingSearchDriverAPIView(APIView):
                     'rate' : utils.getDriverPoint()
                 }
             # firebase message body
+            bookModel = Booking.objects.filter(pk=book.id).first()
             messageBody = {}
             messageBody['book_id'] = book.id
-            messageBody['pickup_latitude'] = address.latitude
-            messageBody['pickup_longitude'] = address.longitude
+            messageBody['pickup_latitude'] = pickupAddress.latitude
+            messageBody['pickup_longitude'] = pickupAddress.longitude
             messageBody['total_distance'] = book.total_distance
             messageBody['price'] = book.price
+            messageBody['customer'] = bookModel.customer.username
+            messageBody['pickup_address_title'] = pickupAddress.title
+            messageBody['pickup_address_description'] = pickupAddress.description
+            messageBody['dropoff_address_title'] = dropOffAddress.title
+            messageBody['dropoff_address_description'] = dropOffAddress.description
+
+
             # send message by firebase
             firebaseResult = utils.send_message(nearestDriverUserInfo.firebase_token , "new_book" , messageBody)
             print("--------------- FIREBASE NOTIFICATION ---------------")
@@ -434,12 +443,13 @@ class BookingSearchDriverAPIView(APIView):
 """
 import json
 class BookingAcceptDriverAPIView(APIView):
-    def get_queryset(self):        
-        queryset = Booking.objects.filter(customer_id=self.request.user.id,id=self.request.POST.get('book_id'))
+    def get_queryset(self):    
+        queryset = Booking.objects.filter(customer_id=self.request.user.id,id=self.request.POST.get('book_id'))    
         return queryset
 
     def put(self, request, format=None):
         bookList = self.get_queryset()
+        print('CUSTOMER', request.user.id)
         result = {}
         if bookList.count() == 0:
             result["resultCode"] = 200
@@ -474,12 +484,22 @@ class BookingAcceptDriverAPIView(APIView):
                 driverUserInfo = UserInfo.objects.get(user_id=book.driver.id)
                 customerUserInfo = UserInfo.objects.get(user_id=self.request.user.id)
 
+                messageBody = {}
+                messageBody["accepted_driver"] = { 
+                    'userId': driverUserInfo.user.id ,
+                    'driverName' : driverUserInfo.user.username , 
+                    'latitude' : driverUserInfo.latitude,
+                    'longitude' : driverUserInfo.longitude,
+                    'phone' : driverUserInfo.phone,
+                    'rate' : utils.getDriverPoint()
+                }
+
                 # BURADA FIREBASE KONTROLU YAPILMALI
                 # CUSTOMER & DRIVER room almış olmalılar
-                firebaseResult = utils.send_notification(driverUserInfo.firebase_token , "BOOKING Room ID >> DRIVER" , str(uniqueRoomID))
+                firebaseResult = utils.send_message(driverUserInfo.firebase_token , "book_accepted" , messageBody)
                 print("--------------- FIREBASE NOTIFICATION ---------------")
                 print(json.loads(firebaseResult.text))
-                firebaseResult = utils.send_notification(customerUserInfo.firebase_token , "BOOKING Room ID >> CUSTOMER" , str(uniqueRoomID))
+                firebaseResult = utils.send_message(customerUserInfo.firebase_token , "book_accepted" , messageBody)
                 print("--------------- FIREBASE NOTIFICATION ---------------")
                 print(json.loads(firebaseResult.text))
                 book.save()
