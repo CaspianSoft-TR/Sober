@@ -26,6 +26,8 @@ from . import utils
 from api.serializers import *
 from api.models import *
 import uuid
+from django.core import serializers
+import json
 
 ########################################
 # USER SERVICES
@@ -403,8 +405,6 @@ class BookingSearchDriverAPIView(APIView):
             book.status = 10
             book.save()
             uniqueRoomID = uuid.uuid4()
-            firebaseResult = utils.send_notification(nearestDriverUserInfo.firebase_token , "BOOKING Room ID >> DRIVER" , str(uniqueRoomID))
-            print("--------------- FIREBASE NOTIFICATION ---------------")
             result["resultCode"] = 100
             result["resultText"] = "SUCCESS"
             result["content"] = { 
@@ -415,6 +415,17 @@ class BookingSearchDriverAPIView(APIView):
                     'phone' : nearestDriverUserInfo.phone,
                     'rate' : utils.getDriverPoint()
                 }
+            # firebase message body
+            messageBody = {}
+            messageBody['book_id'] = book.id
+            messageBody['pickup_latitude'] = address.latitude
+            messageBody['pickup_longitude'] = address.longitude
+            messageBody['total_distance'] = book.total_distance
+            messageBody['price'] = book.price
+            # send message by firebase
+            firebaseResult = utils.send_message(nearestDriverUserInfo.firebase_token , "new_book" , messageBody)
+            print("--------------- FIREBASE NOTIFICATION ---------------")
+            
         return JsonResponse(result)
 
 

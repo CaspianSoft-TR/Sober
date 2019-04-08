@@ -24,7 +24,7 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 SECRET_KEY = '!-rype8$$jtiphg=^yg3hdl2^#5+p@0yw3++=v$$)34@5(%4a8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # ALLOW ALL HOSTS
 ALLOWED_HOSTS = ['*']
@@ -83,6 +83,7 @@ WSGI_APPLICATION = 'sober.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+# Local serve
 '''
 DATABASES = {
     'default': {

@@ -27,6 +27,26 @@ def send_notification(token , messageTitle, messageBody):
 	return requests.post(url=URL,json=fields,headers=headers) 
 
 
+# Send message by firebase
+def send_message(token , messageType, messageBody):
+    URL = "https://fcm.googleapis.com/fcm/send"
+    fields = {
+        'to':token,
+        'data':{
+            'messageType':messageType,
+            'body':messageBody
+        }
+    }
+
+    headers = {
+        'Content-Type':'application/json',
+        'Authorization':'key = AIzaSyAYd8wWQYEJFBzdLJgSGaa1fpJO0OT4APA'
+        }
+
+    return requests.post(url=URL,json=fields,headers=headers) 
+
+
+
 
 """
     This function returns proper drivers for given book
