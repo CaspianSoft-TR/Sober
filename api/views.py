@@ -444,7 +444,8 @@ class BookingSearchDriverAPIView(APIView):
 import json
 class BookingAcceptDriverAPIView(APIView):
     def get_queryset(self):    
-        queryset = Booking.objects.filter(pk=self.request.POST.get('book_id'))    
+        queryset = Booking.objects.filter(driver_id=self.request.user.id,id=self.request.POST.get('book_id'))  
+        print('user', self.request.user.username)  
         return queryset
 
     def put(self, request, format=None):
