@@ -56,21 +56,23 @@ def send_message(token , messageType, messageBody):
         >> book owner
 """
 def findProperDrivers(bookId):
+    from django.db.models import Q
 
     # REJECTED USERS
     improperDriverIdList = []
     for bookDriver in BookDriver.objects.all().filter(book_id=bookId):
         improperDriverIdList.append(bookDriver.driver.id)
 
+    # For testing we comment it for now, after we will unco
     # WORKING DRIVER 
-    for book in Booking.objects.all().filter(status=1):
-        improperDriverIdList.append(book.driver.id)    
+    #for book in Booking.objects.all().filter(status=1):
+        #improperDriverIdList.append(book.driver.id)    
 
     # BOOK OWNER
     improperDriverIdList.append(Booking.objects.get(id=bookId).customer.id)
 
     userProfileList = UserInfo.objects.all()
-    driverList = userProfileList.filter(is_driver=True).exclude(user_id__in=improperDriverIdList)
+    driverList = userProfileList.filter(~Q(latitude = '0'), ~Q(longitude = '0'), is_driver=True).exclude(user_id__in=improperDriverIdList)
 
     return driverList
 
@@ -103,6 +105,7 @@ def findNearestDriver(latitude , longitude , filterMaxDistance , driverList):
     minDistanceIndex = -1
     minDistance = -1
     distanceResult = gmaps.distance_matrix(origins= latitude+','+longitude,destinations=destinations)
+    print('distanceResult', distanceResult)
     for row in distanceResult['rows']:
         elementIndex = 0
         for element in row['elements']:

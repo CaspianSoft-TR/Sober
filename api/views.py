@@ -399,9 +399,19 @@ class BookingSearchDriverAPIView(APIView):
             book = bookList.first()
             # get book pickup address
             properDriverList = utils.findProperDrivers(book.id)
+            print('properDriverList', properDriverList.count())
+
+            if properDriverList.count() == 0:
+                result["resultCode"] = 200
+                result["resultText"] = "SUCCESS_EMPTY"
+                result["content"] = "Proper Drivers Not Found"
+                return JsonResponse(result)
+
             pickupAddress = Address.objects.filter(is_pickup_loc=1,booking_id=book.id).first() 
-            dropOffAddress = Address.objects.filter(is_pickup_loc=0,booking_id=book.id).first()       
-            nearestDriverUserInfo = utils.findNearestDriver(pickupAddress.latitude , pickupAddress.longitude ,10000 , properDriverList)
+            dropOffAddress = Address.objects.filter(is_pickup_loc=0,booking_id=book.id).first() 
+
+            nearestDriverUserInfo = utils.findNearestDriver(pickupAddress.latitude , pickupAddress.longitude ,100000 , properDriverList)
+
             book.driver = nearestDriverUserInfo.user
             book.status = 10
             book.save()
