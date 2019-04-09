@@ -493,7 +493,7 @@ class BookingAcceptDriverAPIView(APIView):
                 book.status = 1
                 uniqueRoomID = uuid.uuid4()
                 driverUserInfo = UserInfo.objects.get(user_id=book.driver.id)
-                customerUserInfo = UserInfo.objects.get(user_id=self.request.user.id)
+                customerUserInfo = UserInfo.objects.get(user_id=book.customer.id)
 
                 messageBody = {}
                 messageBody["accepted_driver"] = { 
