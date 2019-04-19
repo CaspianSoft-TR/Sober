@@ -115,9 +115,9 @@ class RegisterSerializer(serializers.Serializer):
         user.save()
 
         newUserInfo = UserInfo()
-        newUserInfo.phone = request.POST.get("phone", "")
-        newUserInfo.is_customer = (request.POST.get("is_customer") == 'true' or request.POST.get("is_customer") == 'True')
-        newUserInfo.is_driver = (request.POST.get("is_driver") == 'true' or request.POST.get("is_driver") == 'True')
+        newUserInfo.phone = request.POST.get("phone")
+        newUserInfo.is_customer = request.POST.get("is_customer")
+        newUserInfo.is_driver = request.POST.get("is_driver")
         newUserInfo.user = user
         newUserInfo.save()
 
