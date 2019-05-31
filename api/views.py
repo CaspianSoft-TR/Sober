@@ -29,6 +29,9 @@ import uuid
 from django.core import serializers
 import json
 
+from . import notifications 
+
+
 ########################################
 # USER SERVICES
 ########################################
@@ -90,6 +93,35 @@ class UserFirebaseTokenUpdateAPIView(APIView):
         else:
             userProfile = userInfo.first()
             userProfile.firebase_token = self.request.POST.get('token')
+            userProfile.save()
+            result["resultCode"] = 100
+            result["resultText"] = "SUCCESS"
+            result["content"] = "User token updated"
+        
+        return JsonResponse(result)
+
+
+class UpdateUserPushTokenAPIView(APIView):
+    def get_queryset(self):
+        queryset = UserInfo.objects.filter(user=self.request.user.id)
+        return queryset
+
+    def put(self, request, format=None):
+        print(">>> >>> UserPushTokenUpdateAPIView put called")
+        userInfo = self.get_queryset()
+        result = {}
+        
+        if userInfo.count() == 0:
+            result["resultCode"] = 200
+            result["resultText"] = "SUCCESS_EMPTY"
+            result["content"] = "User Profile Not Found Error"
+        elif userInfo.count() > 1:
+            result["resultCode"] = 200
+            result["resultText"] = "FAILURE"
+            result["content"] = "Multiple User Profile Error"
+        else:
+            userProfile = userInfo.first()
+            userProfile.push_token = self.request.POST.get('token')
             userProfile.save()
             result["resultCode"] = 100
             result["resultText"] = "SUCCESS"
@@ -443,6 +475,8 @@ class BookingSearchDriverAPIView(APIView):
 
             # send message by firebase
             firebaseResult = utils.send_message(nearestDriverUserInfo.firebase_token , "new_book" , messageBody)
+
+            notifications.send_push_message(nearestDriverUserInfo.push_token, 'Yeni sifariş' ,messageBody)
             print("--------------- FIREBASE NOTIFICATION ---------------")
             
         return JsonResponse(result)
@@ -508,9 +542,11 @@ class BookingAcceptDriverAPIView(APIView):
                 # BURADA FIREBASE KONTROLU YAPILMALI
                 # CUSTOMER & DRIVER room almış olmalılar
                 firebaseResult = utils.send_message(driverUserInfo.firebase_token , "book_accepted" , messageBody)
-                print("--------------- FIREBASE NOTIFICATION ---------------")
-                print(json.loads(firebaseResult.text))
                 firebaseResult = utils.send_message(customerUserInfo.firebase_token , "book_accepted" , messageBody)
+
+                notifications.send_push_message(customerUserInfo.push_token, 'Sifariş qəbul edildi' ,messageBody)
+                notifications.send_push_message(customerUserInfo.push_token, 'Sifariş qəbul edildi' ,messageBody)
+
                 print("--------------- FIREBASE NOTIFICATION ---------------")
                 print(json.loads(firebaseResult.text))
                 book.save()
@@ -648,3 +684,8 @@ class TestCreateAPIView(CreateAPIView):
         result["content"] = serializer.data
         return JsonResponse(result)
 
+class SendPushNotificationView(APIView):
+    def post(self, request):
+        token = request.data.get('pushToken')
+        notifications.send_push_message(token, 'hello orxan')
+        return Response({'token': token})

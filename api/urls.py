@@ -8,7 +8,8 @@ from .views import (
     UserCarListAllAPIView,
     UserCarDeleteAPIView,
     DriverIDView,
-    DriverLicenseView
+    DriverLicenseView,
+    SendPushNotificationView,
 )
 from rest_framework_jwt.views import ObtainJSONWebToken
 
@@ -43,4 +44,7 @@ urlpatterns = [
 
 
     path('test', views.TestCreateAPIView.as_view(), name='test'),
+
+    path('notify', views.SendPushNotificationView.as_view(), name='SendPushNotificationView'),
+    path('push-token', views.UpdateUserPushTokenAPIView.as_view(), name='update-push-token')
 ]

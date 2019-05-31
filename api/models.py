@@ -28,6 +28,7 @@ class UserInfo(models.Model):
     longitude = models.CharField(max_length=30, default=0)
     latitude = models.CharField(max_length=30, default=0)
     firebase_token = models.CharField(max_length=255, default="")
+    push_token = models.CharField(max_length=255, default="")
     #verified_at = models.DateTimeField(auto_now_add=True, default=None)
 
     def __str__(self):
