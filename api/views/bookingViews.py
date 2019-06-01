@@ -115,6 +115,7 @@ class BookingSearchDriverAPIView(APIView):
             result["resultCode"] = 200
             result["resultText"] = "SUCCESS_EMPTY"
             result["content"] = "Book Not Found Error"
+
         elif bookList.count() > 1:
             result["resultCode"] = 200
             result["resultText"] = "FAILURE"
@@ -151,19 +152,13 @@ class BookingSearchDriverAPIView(APIView):
                 'phone': nearestDriverUserInfo.phone,
                 'rate': utils.getDriverPoint()
             }
-            # firebase message body
-            bookModel = Booking.objects.filter(pk=book.id).first()
-            messageBody = {}
-            messageBody['book_id'] = book.id
-            messageBody['pickup_latitude'] = pickupAddress.latitude
-            messageBody['pickup_longitude'] = pickupAddress.longitude
-            messageBody['total_distance'] = book.total_distance
-            messageBody['price'] = book.price
-            messageBody['customer'] = bookModel.customer.username
-            messageBody['pickup_address_title'] = pickupAddress.title
-            messageBody['pickup_address_description'] = pickupAddress.description
-            messageBody['dropoff_address_title'] = dropOffAddress.title
-            messageBody['dropoff_address_description'] = dropOffAddress.description
+            # push token body
+            messageBody = {
+                'book': {
+                    'status': 'new',
+                    'book_id': book.id,
+                }
+            }
 
             # send message by firebase
             # firebaseResult = utils.send_message(nearestDriverUserInfo.firebase_token, "new_book", messageBody)
@@ -182,12 +177,10 @@ class BookingSearchDriverAPIView(APIView):
 class BookingAcceptDriverAPIView(APIView):
     def get_queryset(self):
         queryset = Booking.objects.filter(driver_id=self.request.user.id, id=self.request.POST.get('book_id'))
-        print('user', self.request.user.username)
         return queryset
 
     def put(self, request, format=None):
         bookList = self.get_queryset()
-        print('CUSTOMER', request.user.id)
         result = {}
         if bookList.count() == 0:
             result["resultCode"] = 200
@@ -199,43 +192,24 @@ class BookingAcceptDriverAPIView(APIView):
             result["content"] = "Multiple Book Error"
         else:
 
-            # -1-   'accept' parametresi alınır
-            # -2-   'accept' == True ise
-            # -2.1- booking status değeri kabul edildi olarak değiştirilir
-            # -2.2- socket.io için unique room id oluşturulur
-            # -2.3- room id, notification ile müşteri ve sürücüye yollanır
-
-            # -3-   'accept' == False ise
-            # -3.1- booking status değeri reddedildi olarak değiştirilir
-            # -3.2- driver id değeri book id ile "book_rejected_driver" tablosuna atılır
-            # -3.3- reddedilmemiş yeni bir sürücü aranır ve result olarak bu sürücü belirtilir
-
-            # -4-   RESULT dönülür
-
             book = bookList.first()
+            customerUserInfo = UserInfo.objects.get(user_id=book.customer.id)
+            driverUserInfo = UserInfo.objects.get(user_id=book.driver.id)
+
             # Driver Accepted Case
             acceptDriver = int(request.POST.get('accept'))
             if acceptDriver == 1:
                 book.status = 1
-                driverUserInfo = UserInfo.objects.get(user_id=book.driver.id)
-                customerUserInfo = UserInfo.objects.get(user_id=book.customer.id)
 
-                messageBody = {}
-                messageBody["accepted_driver"] = {
-                    'userId': driverUserInfo.user.id,
-                    'driverName': driverUserInfo.user.username,
-                    'latitude': driverUserInfo.latitude,
-                    'longitude': driverUserInfo.longitude,
-                    'phone': driverUserInfo.phone,
-                    'rate': utils.getDriverPoint()
+                messageBody = {
+                    'book': {
+                        'status': 'accepted',
+                        'driver_id': driverUserInfo.user.id,
+                        'respond': 1
+                    }
                 }
 
-                # BURADA FIREBASE KONTROLU YAPILMALI
-                #  CUSTOMER & DRIVER room almış olmalılar
-                # firebaseResult = utils.send_message(driverUserInfo.firebase_token, "book_accepted", messageBody)
-                # firebaseResult = utils.send_message(customerUserInfo.firebase_token, "book_accepted", messageBody)
-
-                notifications.send_push_message(customerUserInfo.push_token, 'Sifariş qəbul edildi', messageBody)
+                # notify customer
                 notifications.send_push_message(customerUserInfo.push_token, 'Sifariş qəbul edildi', messageBody)
 
                 book.save()
@@ -256,24 +230,16 @@ class BookingAcceptDriverAPIView(APIView):
                 bookDriver.book = book
                 bookDriver.save()
 
-                # -3.3-
-                # BURADA YENI DRIVER BULUNUP RETURN EDILMELIDIR
-                #  UYARI UYARI UYARI
-                properDriverList = utils.findProperDrivers(book.id)
-                address = Address.objects.filter(is_pickup_loc=1, booking_id=book.id).first()
-                nearestDriverUserInfo = utils.findNearestDriver(address.latitude, address.longitude, 10000,
-                                                                properDriverList)
-                book.driver = nearestDriverUserInfo.user
-                book.save()
-
-                result["resultCode"] = 100
-                result["resultText"] = "SUCCESS"
-                result["content"] = {
-                    'userId': nearestDriverUserInfo.user.id,
-                    'driverName': nearestDriverUserInfo.user.username,
-                    'phone': nearestDriverUserInfo.phone,
-                    'rate': utils.getDriverPoint()
+                messageBody = {
+                    'book': {
+                        'status': 'rejected',
+                        'driver_id': driverUserInfo.user.id,
+                        'respond': 2
+                    }
                 }
+
+                # notify customer
+                notifications.send_push_message(customerUserInfo.push_token, 'Sifariş qəbul olunmadı', messageBody)
 
         return JsonResponse(result)
 
