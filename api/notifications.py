@@ -14,7 +14,10 @@ def send_push_message(token, message, extra=None):
         response = PushClient().publish(
             PushMessage(to=token,
                         body=message,
-                        data=extra))
+                        data=extra,
+                        sound='default',
+                        title='SAS'
+                        ))
     except PushServerError as exc:
         # Encountered some likely formatting/validation error.
         rollbar.report_exc_info(

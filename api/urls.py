@@ -1,17 +1,20 @@
-from django.urls import path
 from django.conf.urls import url
+from django.urls import path, re_path, include
+from rest_framework.routers import DefaultRouter
+
 from api import views
-from .views import (
+from api.views import BookViewSet
+from api.views.mainViews import (
     CarListAPIView,
     CarCreateAPIView,
     UserCarCreateAPIView,
     UserCarListAllAPIView,
-    UserCarDeleteAPIView,
-    DriverIDView,
-    DriverLicenseView,
-    SendPushNotificationView,
 )
-from rest_framework_jwt.views import ObtainJSONWebToken
+
+router = DefaultRouter()
+# Define API RESOURCES
+router.register(r'books', BookViewSet, basename='book')
+#router.register(r'addresses', AccountViewSet)
 
 urlpatterns = [
 
@@ -41,10 +44,10 @@ urlpatterns = [
     path('booking/completed/', views.BookingCompletedAPIView.as_view(), name='booking-completed'),
     path('booking/driver/rate/', views.BookingDriverRateAPIView.as_view(), name='booking-driver-rate'),
 
-
-
     path('test', views.TestCreateAPIView.as_view(), name='test'),
 
     path('notify', views.SendPushNotificationView.as_view(), name='SendPushNotificationView'),
-    path('push-token', views.UpdateUserPushTokenAPIView.as_view(), name='update-push-token')
+    path('push-token', views.UpdateUserPushTokenAPIView.as_view(), name='update-push-token'),
 ]
+
+urlpatterns += router.urls

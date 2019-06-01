@@ -1,4 +1,3 @@
-
 from rest_framework import serializers
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
@@ -9,6 +8,7 @@ from allauth.utils import (
 from allauth.account import app_settings as allauth_settings
 from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.serializers import UserDetailsSerializer
+
 from api.models import (
     UserInfo,
     Car,
@@ -27,7 +27,7 @@ class UserSerializer(UserDetailsSerializer):
     is_customer = serializers.BooleanField(source="userinfo.is_customer")
 
     class Meta(UserDetailsSerializer.Meta):
-        fields = UserDetailsSerializer.Meta.fields + ('phone','is_driver', 'is_customer')
+        fields = UserDetailsSerializer.Meta.fields + ('phone', 'is_driver', 'is_customer')
 
     def update(self, instance, validated_data):
         print("DENEME")
@@ -45,7 +45,6 @@ class UserSerializer(UserDetailsSerializer):
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = UserInfo
         fields = ('user', 'phone')
@@ -62,7 +61,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
         return instance
 
 
-# CUSTOM REGISTER SERIALIZER
+#  CUSTOM REGISTER SERIALIZER
 class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField(
         max_length=get_username_max_length(),
@@ -121,9 +120,9 @@ class RegisterSerializer(serializers.Serializer):
         newUserInfo.user = user
         newUserInfo.save()
 
-        #userInfoData = request.POST.copy()
+        # userInfoData = request.POST.copy()
         # print(">>>>>>>>>>>>><")
-        #print(request.POST.get("phone", ""))
+        # print(request.POST.get("phone", ""))
         # print(user.username)
         # print(">>>>>>>>>>>>><")
 
@@ -131,7 +130,7 @@ class RegisterSerializer(serializers.Serializer):
         # print(userInfoData)
         # print(">>>>>>>>>>>>><")
 
-        #userInfo = UserInfoSerializer(data=userInfoData)
+        # userInfo = UserInfoSerializer(data=userInfoData)
         # is_valid() serializer data ile oluşması sonucu alınır
         # if userInfo.is_valid():
         # print(userInfo.validated_data)
@@ -141,11 +140,13 @@ class RegisterSerializer(serializers.Serializer):
         # print(user)
         return user
 
+
 # Verify Email
 
 
 class VerifyEmailSerializer(serializers.Serializer):
     key = serializers.CharField()
+
 
 ###############################################################################
 
@@ -175,6 +176,7 @@ class UserAddressSerializer(serializers.ModelSerializer):
         model = Address
         fields = ('title', 'description', 'longitude', 'latitude')
 
+
 # Driver National ID serializer
 
 
@@ -186,6 +188,7 @@ class DriverIDSerializer(serializers.ModelSerializer):
             'national_id',
 
         )
+
 
 # Driver  DriverLicense serializer
 
@@ -207,7 +210,6 @@ class BookingAddressSerializer(serializers.ListSerializer):
 
 
 class BookingSerializer(serializers.Serializer):
-
     id = serializers.SerializerMethodField()
     pickup_address_title = serializers.CharField(max_length=50)
     pickup_address_description = serializers.CharField(max_length=255)
@@ -256,11 +258,10 @@ class BookingSerializer(serializers.Serializer):
         arrivalAddress.booking = newBook
         arrivalAddress.save()
 
-        # find nearest userInfo
-        #nearestDriverUserInfo = findNearestDriver(latitude=pickupAddress.latitude , longitude=pickupAddress.longitude , filterMaxDistance=10000)
-        #newBook.driver = nearestDriverUserInfo.user
+        #  find nearest userInfo
+        # nearestDriverUserInfo = findNearestDriver(latitude=pickupAddress.latitude , longitude=pickupAddress.longitude , filterMaxDistance=10000)
+        # newBook.driver = nearestDriverUserInfo.user
         return newBook
-
 
 
 ########################################
@@ -298,3 +299,24 @@ class TESTSerializer(serializers.Serializer):
         instance.content = validated_data.get('content', instance.content)
         instance.created = validated_data.get('created', instance.created)
         return instance
+
+
+class BookSerializer(serializers.ModelSerializer):
+    driver = UserDetailsSerializer()
+    customer = UserDetailsSerializer()
+    pickUp_address = serializers.SerializerMethodField()
+    dropOff_address = serializers.SerializerMethodField()
+
+    def get_pickUp_address(self, obj):
+        address = Address.objects.filter(booking_id=obj.id, is_pickup_loc=1).first()
+        serializer = UserAddressSerializer(address)
+        return serializer.data
+
+    def get_dropOff_address(self, obj):
+        address = Address.objects.filter(booking_id=obj.id, is_pickup_loc=0).first()
+        serializer = UserAddressSerializer(address)
+        return serializer.data
+
+    class Meta:
+        fields = ('id', 'status', 'total_distance', 'price', 'driver', 'customer', 'pickUp_address', 'dropOff_address')
+        model = Booking
