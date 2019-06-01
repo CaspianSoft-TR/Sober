@@ -3,9 +3,7 @@
 ########################################
 from django.contrib.auth.models import User
 from django.http import JsonResponse, Http404
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import CreateAPIView, ListAPIView, get_object_or_404
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
@@ -377,5 +375,9 @@ class BookViewSet(viewsets.ViewSet):
     def list(self, request):
         books = Booking.objects.all()
         serializer = BookSerializer(books, many=True)
-        response = {'content': serializer.data}
+        response = {
+            'resultCode': 100,
+            'resultText': 'SUCCESS',
+            'content': serializer.data
+        }
         return JsonResponse(response)

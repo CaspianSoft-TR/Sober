@@ -1,3 +1,6 @@
+from django.db import models
+from django.db.models import Avg
+from rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
@@ -6,8 +9,6 @@ from allauth.utils import (
     get_username_max_length
 )
 from allauth.account import app_settings as allauth_settings
-from rest_auth.registration.serializers import RegisterSerializer
-from rest_auth.serializers import UserDetailsSerializer
 
 from api.models import (
     UserInfo,
@@ -45,9 +46,16 @@ class UserSerializer(UserDetailsSerializer):
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    rating = serializers.SerializerMethodField()
+
+    def get_rating(self, obj):
+        driver_rate = Booking.objects.all().aggregate(Avg('driver_rate'))
+        return driver_rate['driver_rate__avg']
+
     class Meta:
         model = UserInfo
-        fields = ('user', 'phone')
+        fields = ('phone', 'latitude', 'longitude', 'rating', 'user')
 
     # Override CREATE method
     def create(self, validated_data):

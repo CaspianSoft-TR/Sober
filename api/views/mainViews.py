@@ -9,14 +9,11 @@ from rest_framework.generics import (
     DestroyAPIView,
 )
 from rest_framework.views import APIView
-from rest_framework import viewsets, status
 from rest_auth.registration.views import (
     RegisterView,
     VerifyEmailSerializer,)
-from api import utils
 from api.serializers import *
 from api.models import *
-import uuid
 
 from api import notifications
 
@@ -265,36 +262,6 @@ class UserAddressDeleteAPIView(DestroyAPIView):
 ########################################
 #  User Add National ID
 ########################################
-
-
-class DriverIDView(APIView):
-    def post(self, request, format=None):
-        serializer = DriverIDSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-########################################
-#  User Add Driver License
-########################################
-
-
-class DriverLicenseView(APIView):
-    def post(self, request, format=None):
-        serializer = DriverLicenseSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-########################################
-#  
-########################################
-
 
 class CarListAPIView(ListAPIView):
     queryset = Car.objects.all()

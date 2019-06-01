@@ -27,16 +27,17 @@ class UserInfo(models.Model):
     latitude = models.CharField(max_length=30, default=0)
     firebase_token = models.CharField(max_length=255, default="")
     push_token = models.CharField(max_length=255, default="")
-    #verified_at = models.DateTimeField(auto_now_add=True, default=None)
+
+    # verified_at = models.DateTimeField(auto_now_add=True, default=None)
 
     def __str__(self):
         return self.phone
 
 
 class Driver(models.Model):
-    #driver_id = models.AutoField(primary_key=True)
+    # driver_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    #vehicle = models.ForeignKey(Car, on_delete=models.CASCADE)
+    # vehicle = models.ForeignKey(Car, on_delete=models.CASCADE)
     phone = models.CharField(max_length=50)
     national_id = models.ImageField(upload_to='sober/static/national_id', blank=True)
     driver_license = models.ImageField(upload_to='sober/static/driving_license', blank=True)
@@ -123,18 +124,19 @@ class BookDriver(BaseModel):
 
 
 ###
-class DriverLocation (models.Model):
+class DriverLocation(models.Model):
     driver_id = models.ForeignKey(Driver, on_delete=models.CASCADE)
     longitude = models.CharField(max_length=30)
     latitude = models.CharField(max_length=30)
     location_name = models.CharField(max_length=20)
-    #category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    # category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.location_name
 
 
-class Transaction (models.Model):
+class Transaction(models.Model):
     order_id = models.AutoField(primary_key=True)
     driver_id = models.ForeignKey(Driver, on_delete=models.CASCADE)
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
@@ -143,7 +145,7 @@ class Transaction (models.Model):
         return self.order_id
 
 
-class Review (models.Model):
+class Review(models.Model):
     review_id = models.AutoField(primary_key=True)
     driver_id = models.ForeignKey(Driver, on_delete=models.CASCADE)
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
@@ -156,14 +158,14 @@ class Review (models.Model):
 class DriverHistory(models.Model):
     driver_id = models.ForeignKey(Driver, on_delete=models.CASCADE)
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    #pickup_location = models.CharField(Category, max_length=20)
-    #arrival_destination = models.CharField(Category, max_length=20)
+    # pickup_location = models.CharField(Category, max_length=20)
+    # arrival_destination = models.CharField(Category, max_length=20)
     booked_time = models.DateTimeField(auto_now_add=True)
 
 
 class TravelHistory(models.Model):
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
     driver_id = models.ForeignKey(Driver, on_delete=models.CASCADE)
-    #pickup_location = models.CharField(Category, max_length=20)
-    #arrival_destination = models.CharField(Category, max_length=20)
+    # pickup_location = models.CharField(Category, max_length=20)
+    # arrival_destination = models.CharField(Category, max_length=20)
     booked_time = models.DateTimeField(auto_now_add=True)
