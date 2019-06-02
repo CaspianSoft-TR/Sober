@@ -202,7 +202,7 @@ class BookingAcceptDriverAPIView(APIView):
                 book.status = 1
 
                 messageBody = {
-                    'book': {
+                    'driver': {
                         'status': 'accepted',
                         'driver_id': driverUserInfo.user.id,
                         'respond': 1
@@ -231,7 +231,7 @@ class BookingAcceptDriverAPIView(APIView):
                 bookDriver.save()
 
                 messageBody = {
-                    'book': {
+                    'driver': {
                         'status': 'rejected',
                         'driver_id': driverUserInfo.user.id,
                         'respond': 2
@@ -240,6 +240,10 @@ class BookingAcceptDriverAPIView(APIView):
 
                 # notify customer
                 notifications.send_push_message(customerUserInfo.push_token, 'Sifariş qəbul olunmadı', messageBody)
+
+                result["resultCode"] = 100
+                result["resultText"] = "REJECTED"
+                result["content"] = "Book Rejected"
 
         return JsonResponse(result)
 
