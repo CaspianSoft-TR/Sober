@@ -83,6 +83,7 @@ class Booking(BaseModel):
         (1, 'ACCEPTED'),
         (2, 'REJECTED'),
         (10, 'DRIVER_RECOMENDED'),
+        (20, 'DRIVER_ARRIVED'),
         (100, 'CANCEL'),
         (200, 'COMPLETED')
     ), default=0)

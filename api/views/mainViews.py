@@ -1,5 +1,5 @@
 
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -11,11 +11,11 @@ from rest_framework.generics import (
 from rest_framework.views import APIView
 from rest_auth.registration.views import (
     RegisterView,
-    VerifyEmailSerializer,)
+)
 from api.serializers import *
 from api.models import *
 
-from api import notifications
+from api.utils import notifications
 
 
 ########################################

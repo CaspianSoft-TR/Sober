@@ -14,7 +14,7 @@ router = DefaultRouter()
 # Define API RESOURCES
 router.register(r'books', BookViewSet, basename='book')
 router.register(r'drivers', DriverViewSet, basename='driver')
-#router.register(r'addresses', AccountViewSet)
+# router.register(r'addresses', AccountViewSet)
 
 urlpatterns = [
 
@@ -41,6 +41,7 @@ urlpatterns = [
     path('booking/list', views.BookingListAPIView.as_view(), name='booking-list'),
     path('booking/cancel/', views.BookingCancelAPIView.as_view(), name='booking-cancel'),
     path('booking/search-driver/', views.BookingSearchDriverAPIView.as_view(), name='booking-search-driver'),
+    path('booking/<int:book_id>/arrived', BookViewSet.as_view({"post": "arrived"}), name='booking-driver-arrived'),
     path('booking/completed/', views.BookingCompletedAPIView.as_view(), name='booking-completed'),
     path('booking/driver/rate/', views.BookingDriverRateAPIView.as_view(), name='booking-driver-rate'),
 

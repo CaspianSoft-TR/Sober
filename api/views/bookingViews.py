@@ -2,16 +2,19 @@
 #  BOOKING
 ########################################
 from django.contrib.auth.models import User
-from django.http import JsonResponse, Http404
-from rest_framework.generics import CreateAPIView, ListAPIView, get_object_or_404
-from rest_framework.response import Response
+from django.http import JsonResponse
+from rest_framework.decorators import action, permission_classes
+from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.views import APIView
-from rest_framework.viewsets import GenericViewSet
 
-from api import utils, notifications
+from api.utils import utils, notifications, firebase
 from api.models import Booking, Address, UserInfo, BookDriver
 from api.serializers import BookingSerializer, BookSerializer
-from rest_framework import status, mixins, permissions, viewsets
+from rest_framework import viewsets
+
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+
+from api.utils.firebase import Firebase
 
 
 class BookingCreateAPIView(CreateAPIView):
@@ -175,6 +178,9 @@ class BookingSearchDriverAPIView(APIView):
 
 
 class BookingAcceptDriverAPIView(APIView):
+    def __init__(self):
+        self.firebase = Firebase()
+
     def get_queryset(self):
         queryset = Booking.objects.filter(driver_id=self.request.user.id, id=self.request.POST.get('book_id'))
         return queryset
@@ -200,10 +206,27 @@ class BookingAcceptDriverAPIView(APIView):
             acceptDriver = int(request.POST.get('accept'))
             if acceptDriver == 1:
                 book.status = 1
+                book.save()
+
+                room_id = 'room-' + utils.make_uuid()
+                data = {
+                    "driver": {
+                        "id": driverUserInfo.user_id,
+                        "latitude": driverUserInfo.latitude,
+                        "longitude": driverUserInfo.longitude
+                    },
+                    "customer": {
+                        "id": customerUserInfo.user_id,
+                        "latitude": customerUserInfo.latitude,
+                        "longitude": customerUserInfo.longitude
+                    }
+                }
+                self.firebase.create('rooms/' + room_id, data)
 
                 messageBody = {
                     'driver': {
                         'status': 'accepted',
+                        'room_id': room_id,
                         'driver_id': driverUserInfo.user.id,
                         'respond': 1
                     }
@@ -212,11 +235,11 @@ class BookingAcceptDriverAPIView(APIView):
                 # notify customer
                 notifications.send_push_message(customerUserInfo.push_token, 'Sifariş qəbul edildi', messageBody)
 
-                book.save()
-
                 result["resultCode"] = 100
                 result["resultText"] = "SUCCESS"
-                result["content"] = "Trip started..."
+                result["content"] = {
+                    'tracking_room_id': room_id
+                }
 
             # -3- Driver Rejected Case
             else:
@@ -351,3 +374,26 @@ class BookViewSet(viewsets.ViewSet):
             'content': serializer.data
         }
         return JsonResponse(response)
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticatedOrReadOnly])
+    def arrived(self, request, book_id=None):
+        book = Booking.objects.get(pk=book_id)
+        book.status = 20
+        book.save()
+        serializer = BookSerializer(book)
+
+        # get customer detail
+        customer = UserInfo.objects.get(user_id=book.customer.id)
+
+        messageBody = {
+            'driver': {
+                'status': 'arrived',
+                'driver_id': book.driver.id,
+                'respond': 20
+            }
+        }
+
+        # notify customer
+        notifications.send_push_message(customer.push_token, 'Sürücü sizi gözləyir', messageBody)
+
+        return JsonResponse(serializer.data)

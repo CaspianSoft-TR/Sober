@@ -2,6 +2,7 @@
 import requests 
 import googlemaps
 from api.models import *
+import uuid
 
 """
 	This function send notifications to given token devices
@@ -120,6 +121,9 @@ def findNearestDriver(latitude , longitude , filterMaxDistance , driverList):
                         
             elementIndex=elementIndex+1
     return driverObjectList[minDistanceIndex]
+
+def make_uuid():
+    return uuid.uuid4().hex[:6].upper()
 
 
 
