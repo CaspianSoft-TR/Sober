@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from api.utils import utils, notifications, firebase
 from api.models import Booking, Address, UserInfo, BookDriver
-from api.serializers import BookingSerializer, BookSerializer, UserInfoSerializer
+from api.serializers import CreateBookingSerializer, BookSerializer, UserInfoSerializer
 from rest_framework import viewsets
 
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
@@ -19,25 +19,28 @@ from api.utils.firebase import Firebase
 
 class BookingCreateAPIView(CreateAPIView):
     queryset = Booking.objects.all()
-    serializer_class = BookingSerializer
+    serializer_class = CreateBookingSerializer
 
     # permission_classes = (IsAdminUser,)
     # authentication_classes = (TokenAuthentication,)
 
     def perform_create(self, serializer):
-        print(">>> >>> BookingCreateAPIView CALLED ")
         serializer.save(self.request)
+
+        # convert to BookSerializer
+        book = Booking.objects.get(pk=serializer.data['id'])
+        serializer = BookSerializer(book)
+
         result = {}
         result["resultCode"] = 100
         result["resultText"] = "SUCCESS"
         result["content"] = serializer.data
+
         return JsonResponse(result)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # headers = self.get_success_headers(serializer.data)
-        # return Response({'Message': 'You have successfully register'}, status=status.HTTP_201_CREATED, headers=headers)
         return self.perform_create(serializer)
 
 
@@ -140,7 +143,7 @@ class BookingSearchDriverAPIView(APIView):
             result["resultCode"] = 100
             result["resultText"] = "SUCCESS"
             result["content"] = serializer.data
-            # push token body
+            # push message body
             messageBody = {
                 'book': {
                     'status': 'new',

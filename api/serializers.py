@@ -217,9 +217,9 @@ class BookingAddressSerializer(serializers.ListSerializer):
         fields = ('title', 'description', 'longitude', 'latitude')
 
 
-class BookingSerializer(serializers.Serializer):
+class CreateBookingSerializer(serializers.Serializer):
     id = serializers.SerializerMethodField()
-    pickup_address_title = serializers.CharField(max_length=50)
+    pickup_address_title = serializers.CharField(max_length=50, required=True)
     pickup_address_description = serializers.CharField(max_length=255)
     pickup_address_longitude = serializers.CharField(max_length=30, default=0)
     pickup_address_latitude = serializers.CharField(max_length=30, default=0)
@@ -235,7 +235,8 @@ class BookingSerializer(serializers.Serializer):
         return self.validated_data['book_id']
 
     def validate(self, data):
-        if data['payment_type'] < 0 and data['payment_type'] > 1:
+        payment_type = data['payment_type']
+        if payment_type > 1 or payment_type < 0:
             raise serializers.ValidationError(("Payment type should be 0 for cash and 1 for credit card"))
         return data
 
@@ -283,9 +284,6 @@ class TestClass(object):
         self.email = email
         self.content = content
         self.created = created or datetime.now()
-
-
-from rest_framework.renderers import JSONRenderer
 
 
 class TESTSerializer(serializers.Serializer):
