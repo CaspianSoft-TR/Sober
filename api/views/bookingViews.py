@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from api.utils import utils, notifications, firebase
 from api.models import Booking, Address, UserInfo, BookDriver
-from api.serializers import BookingSerializer, BookSerializer
+from api.serializers import BookingSerializer, BookSerializer, UserInfoSerializer
 from rest_framework import viewsets
 
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
@@ -107,28 +107,20 @@ class BookingCancelAPIView(APIView):
 
 class BookingSearchDriverAPIView(APIView):
     def get_queryset(self):
-        queryset = Booking.objects.filter(customer_id=self.request.user.id, id=self.request.POST.get('id'))
-        return queryset
+        if Booking.objects.filter(customer_id=self.request.user.id, id=self.request.POST.get('id')).exists():
+            queryset = Booking.objects.get(pk=self.request.POST.get('id'))
+            return queryset
 
     def put(self, request, format=None):
-        print(">>> >>> BookingSearchDriverAPIView put called")
-        bookList = self.get_queryset()
+        book = self.get_queryset()
         result = {}
-        if bookList.count() == 0:
+        if not book:
             result["resultCode"] = 200
             result["resultText"] = "SUCCESS_EMPTY"
             result["content"] = "Book Not Found Error"
-
-        elif bookList.count() > 1:
-            result["resultCode"] = 200
-            result["resultText"] = "FAILURE"
-            result["content"] = "Multiple Book Error"
         else:
-            # get book from id
-            book = bookList.first()
-            # get book pickup address
+            # get proper drivers
             properDriverList = utils.findProperDrivers(book.id)
-            print('properDriverList', properDriverList.count())
 
             if properDriverList.count() == 0:
                 result["resultCode"] = 200
@@ -136,25 +128,18 @@ class BookingSearchDriverAPIView(APIView):
                 result["content"] = "Proper Drivers Not Found"
                 return JsonResponse(result)
 
+            # get book pickup address
             pickupAddress = Address.objects.filter(is_pickup_loc=1, booking_id=book.id).first()
-            dropOffAddress = Address.objects.filter(is_pickup_loc=0, booking_id=book.id).first()
-
             nearestDriverUserInfo = utils.findNearestDriver(pickupAddress.latitude, pickupAddress.longitude, 100000,
                                                             properDriverList)
-
             book.driver = nearestDriverUserInfo.user
             book.status = 10
             book.save()
+
+            serializer = UserInfoSerializer(nearestDriverUserInfo)
             result["resultCode"] = 100
             result["resultText"] = "SUCCESS"
-            result["content"] = {
-                'userId': nearestDriverUserInfo.user.id,
-                'driverName': nearestDriverUserInfo.user.username,
-                'latitude': nearestDriverUserInfo.latitude,
-                'longitude': nearestDriverUserInfo.longitude,
-                'phone': nearestDriverUserInfo.phone,
-                'rate': utils.getDriverPoint()
-            }
+            result["content"] = serializer.data
             # push token body
             messageBody = {
                 'book': {
@@ -163,12 +148,8 @@ class BookingSearchDriverAPIView(APIView):
                 }
             }
 
-            # send message by firebase
-            # firebaseResult = utils.send_message(nearestDriverUserInfo.firebase_token, "new_book", messageBody)
-
+            # notify driver
             notifications.send_push_message(nearestDriverUserInfo.push_token, 'Yeni sifariş', messageBody)
-            print("--------------- FIREBASE NOTIFICATION ---------------")
-
         return JsonResponse(result)
 
 
