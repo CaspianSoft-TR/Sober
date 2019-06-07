@@ -19,6 +19,8 @@ from django.urls import path
 from django.conf.urls import url, include
 from rest_framework.documentation import include_docs_urls
 from rest_framework import routers
+from rest_framework_jwt.views import obtain_jwt_token
+
 from api.views.mainViews import RegisterView
 
 router = routers.DefaultRouter()
@@ -47,7 +49,7 @@ urlpatterns = [
     path('', include('drfpasswordless.urls')),
 
     # JWT login
-    #url(r'^api-token-auth/', obtain_jwt_token),
+    url(r'^oauth/token', obtain_jwt_token),
 
 
 ]

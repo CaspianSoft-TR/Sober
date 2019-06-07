@@ -1,4 +1,3 @@
-from django.db import models
 from django.db.models import Avg
 from rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers
@@ -112,21 +111,24 @@ class RegisterSerializer(serializers.Serializer):
             'email': self.validated_data.get('email', '')
         }
 
-    def save(self, request):
+    def create(self, validated_data):
         adapter = get_adapter()
-        user = adapter.new_user(request)
+        user = adapter.new_user(validated_data)
         self.cleaned_data = self.get_cleaned_data()
-        adapter.save_user(request, user, self)
-        self.custom_signup(request, user)
-        setup_user_email(request, user, [])
-        user.save()
+        adapter.save_user(validated_data, user, self)
+        self.custom_signup(validated_data, user)
+        setup_user_email(validated_data, user, [])
+        #user.save()
+
+        print('is driver', request.POST.get("is_driver"))
+        print('is_customer', request.POST.get("is_customer"))
 
         newUserInfo = UserInfo()
         newUserInfo.phone = request.POST.get("phone")
         newUserInfo.is_customer = request.POST.get("is_customer")
         newUserInfo.is_driver = request.POST.get("is_driver")
         newUserInfo.user = user
-        newUserInfo.save()
+        #newUserInfo.save()
 
         # userInfoData = request.POST.copy()
         # print(">>>>>>>>>>>>><")

@@ -1,3 +1,4 @@
+from django.conf.urls import url, include
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
@@ -17,6 +18,8 @@ router.register(r'drivers', DriverViewSet, basename='driver')
 # router.register(r'addresses', AccountViewSet)
 
 urlpatterns = [
+
+    url(r'^auth/', include('rest_auth.urls')),
 
     path('register/', views.RegisterView.as_view()),
 

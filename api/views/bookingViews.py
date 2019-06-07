@@ -332,7 +332,7 @@ class BookingDriverRateAPIView(APIView):
 
 
 class BookViewSet(viewsets.ViewSet):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     # serializer_class = BookSerializer
 
     """
@@ -360,8 +360,8 @@ class BookViewSet(viewsets.ViewSet):
         return JsonResponse(response)
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticatedOrReadOnly])
-    def arrived(self, request, book_id=None):
-        book = Booking.objects.get(pk=book_id)
+    def arrived(self, request, pk=None):
+        book = Booking.objects.get(pk=pk)
         book.status = 20
         book.save()
         serializer = BookSerializer(book)

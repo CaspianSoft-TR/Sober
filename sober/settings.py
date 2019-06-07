@@ -11,11 +11,10 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import datetime
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -41,7 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'drfpasswordless',
-    #'rest_registration',
+    # 'rest_registration',
     'rest_auth',
     'rest_auth.registration',
     'allauth',
@@ -79,10 +78,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'sober.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
+'''
 # Local serve
 DATABASES = {
     'default': {
@@ -91,15 +89,16 @@ DATABASES = {
             'sql_mode': 'traditional',
         },
         'NAME': 'sober',
-        'USER': 'developer', #'root',
-        'PASSWORD': 'CS4204747o@', #'root',
+        'USER': 'developer',  # 'root',
+        'PASSWORD': 'CS4204747o@',  # 'root',
         'HOST': '127.0.0.1',
-        'PORT': '3307', #'3306',
+        'PORT': '3307',  # '3306',
     }
 }
-
 '''
-# Remote server 
+
+
+# Remote server
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -113,7 +112,6 @@ DATABASES = {
         'PORT': '3306', 
     }
 }
-'''
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -133,7 +131,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 LANGUAGE_CODE = 'en-us'
@@ -141,7 +138,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
@@ -153,24 +149,6 @@ STATICFILES_DIRS = [
 SITE_ID = 1
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# REST Framework
-# https://www.django-rest-framework.org/
-REST_FRAMEWORK = {
-
-    #  'DEFAULT_PERMISSION_CLASSES': (
-    # 'rest_framework.permissions.IsAuthenticated',
-    # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    #'rest_framework.permissions.IsAdminUser'
-    # ),
-
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-        #'rest_framework.authentication.SessionAuthentication',
-    ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
-}
-
 PASSWORDLESS_AUTH = {
 
     'PASSWORDLESS_AUTH_TYPES': ['EMAIL'],
@@ -179,18 +157,26 @@ PASSWORDLESS_AUTH = {
     'PASSWORDLESS_USER_EMAIL_VERIFIED_FIELD_NAME': 'email_verified',
 
 }
-''' JWT Settings 
+
+JWT_AUTH = {
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'api.utils.custom_jwt.jwt_response_payload_handler',
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=15),  # Token expires * minutes after being issued
+    'JWT_AUTH_HEADER_PREFIX': 'Bearer', #'JWT'
+}
+
+# JWT Settings
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
     ),
 }
-'''
+REST_USE_JWT = True
+
 # REST Registration
 # https://pypi.org/project/django-rest-registration/
 REST_REGISTRATION = {
@@ -200,11 +186,9 @@ REST_REGISTRATION = {
     'VERIFICATION_FROM_EMAIL': 'no-reply@example.com',
 }
 
-
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'api.serializers.UserSerializer'
 }
-
 
 try:
     from .local_settings import *
