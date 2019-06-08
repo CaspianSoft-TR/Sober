@@ -1,4 +1,3 @@
-
 from django.http import JsonResponse
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAdminUser
@@ -22,9 +21,22 @@ from api.utils import notifications
 # USER SERVICES
 ########################################
 
-class RegisterView(RegisterView):
-    def get_serializer_class(self):
-        return RegisterSerializer
+class RegisterView(CreateAPIView):
+    queryset = UserInfo.objects.all()
+    serializer_class = RegisterSerializer
+
+    # permission_classes = (IsAdminUser,)
+    # authentication_classes = (TokenAuthentication,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = RegisterSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        result = {}
+        result["resultCode"] = 100
+        result["resultText"] = "SUCCESS"
+        result["content"] = serializer.data
+        return JsonResponse(result)
 
 
 class UserLocationUpdateAPIView(APIView):
@@ -37,7 +49,7 @@ class UserLocationUpdateAPIView(APIView):
         userInfo = self.get_queryset()
         print(type(userInfo))
         result = {}
-        
+
         if userInfo.count() == 0:
             result["resultCode"] = 200
             result["resultText"] = "SUCCESS_EMPTY"
@@ -54,7 +66,7 @@ class UserLocationUpdateAPIView(APIView):
             result["resultCode"] = 100
             result["resultText"] = "SUCCESS"
             result["content"] = "User Location Updated"
-        
+
         return JsonResponse(result)
 
 
@@ -67,7 +79,7 @@ class UserFirebaseTokenUpdateAPIView(APIView):
         print(">>> >>> UserFirebaseTokenUpdateAPIView put called")
         userInfo = self.get_queryset()
         result = {}
-        
+
         if userInfo.count() == 0:
             result["resultCode"] = 200
             result["resultText"] = "SUCCESS_EMPTY"
@@ -83,7 +95,7 @@ class UserFirebaseTokenUpdateAPIView(APIView):
             result["resultCode"] = 100
             result["resultText"] = "SUCCESS"
             result["content"] = "User token updated"
-        
+
         return JsonResponse(result)
 
 
@@ -96,7 +108,7 @@ class UpdateUserPushTokenAPIView(APIView):
         print(">>> >>> UserPushTokenUpdateAPIView put called")
         userInfo = self.get_queryset()
         result = {}
-        
+
         if userInfo.count() == 0:
             result["resultCode"] = 200
             result["resultText"] = "SUCCESS_EMPTY"
@@ -112,7 +124,7 @@ class UpdateUserPushTokenAPIView(APIView):
             result["resultCode"] = 100
             result["resultText"] = "SUCCESS"
             result["content"] = "User token updated"
-        
+
         return JsonResponse(result)
 
 
@@ -155,11 +167,12 @@ class CarCreateAPIView(CreateAPIView):
 class UserCarCreateAPIView(CreateAPIView):
     queryset = UserCar.objects.all()
     serializer_class = UserCarSerializer
-    #permission_classes = (IsAdminUser,)
-    #authentication_classes = (TokenAuthentication,)
+
+    # permission_classes = (IsAdminUser,)
+    # authentication_classes = (TokenAuthentication,)
 
     def perform_create(self, serializer):
-        #carId = Car.objects.get(id=serializer.validated_data['car_idx'])
+        # carId = Car.objects.get(id=serializer.validated_data['car_idx'])
         # print(serializer.validated_data['car_idx'])
 
         serializer.save(user=self.request.user)
@@ -174,8 +187,9 @@ class UserCarCreateAPIView(CreateAPIView):
 class UserCarListAllAPIView(ListAPIView):
     queryset = UserCar.objects.all()
     serializer_class = UserCarSerializer
-    #permission_classes = (IsAdminUser,)
-    #authentication_classes = (TokenAuthentication,)
+
+    # permission_classes = (IsAdminUser,)
+    # authentication_classes = (TokenAuthentication,)
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -189,8 +203,9 @@ class UserCarListAllAPIView(ListAPIView):
 
 class UserCarDeleteAPIView(DestroyAPIView):
     serializer_class = UserCarSerializer
-    #permission_classes = (IsAdminUser,)
-    #authentication_classes = (TokenAuthentication,)
+
+    # permission_classes = (IsAdminUser,)
+    # authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         queryset = UserCar.objects.filter(user_id=self.request.user.id, id=self.kwargs['pk'])
@@ -203,8 +218,9 @@ class UserCarDeleteAPIView(DestroyAPIView):
 class UserAddressCreateAPIView(CreateAPIView):
     queryset = Address.objects.all()
     serializer_class = UserAddressSerializer
-    #permission_classes = (IsAdminUser,)
-    #authentication_classes = (TokenAuthentication,)
+
+    # permission_classes = (IsAdminUser,)
+    # authentication_classes = (TokenAuthentication,)
 
     def perform_create(self, serializer):
         print(">>> >>> UserAddressCreateAPIView CALLED ")
@@ -219,8 +235,9 @@ class UserAddressCreateAPIView(CreateAPIView):
 class UserAddressListAPIView(ListAPIView):
     queryset = Address.objects.all()
     serializer_class = UserAddressSerializer
-    #permission_classes = (IsAdminUser,)
-    #authentication_classes = (TokenAuthentication,)
+
+    # permission_classes = (IsAdminUser,)
+    # authentication_classes = (TokenAuthentication,)
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -237,7 +254,8 @@ class UserAddressListAllAPIView(ListAPIView):
     queryset = Address.objects.all()
     serializer_class = UserAddressSerializer
     permission_classes = (IsAdminUser,)
-    #authentication_classes = (TokenAuthentication,)
+
+    # authentication_classes = (TokenAuthentication,)
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -251,8 +269,9 @@ class UserAddressListAllAPIView(ListAPIView):
 
 class UserAddressDeleteAPIView(DestroyAPIView):
     serializer_class = UserAddressSerializer
-    #permission_classes = (IsAdminUser,)
-    #authentication_classes = (TokenAuthentication,)
+
+    # permission_classes = (IsAdminUser,)
+    # authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         queryset = Address.objects.filter(user_id=self.request.user.id, id=self.kwargs['pk'])
@@ -283,10 +302,11 @@ class CarListAPIView(ListAPIView):
 class TestCreateAPIView(CreateAPIView):
     queryset = Booking.objects.all()
     serializer_class = TESTSerializer
-    #permission_classes = (IsAdminUser,)
-    #authentication_classes = (TokenAuthentication,)
 
-    def perform_create(self, serializer):   
+    # permission_classes = (IsAdminUser,)
+    # authentication_classes = (TokenAuthentication,)
+
+    def perform_create(self, serializer):
         print(">>> >>> TestCreateAPIView CALLED ")
         print(type(serializer))
 
@@ -297,6 +317,7 @@ class TestCreateAPIView(CreateAPIView):
         result["resultText"] = "SUCCESS"
         result["content"] = serializer.data
         return JsonResponse(result)
+
 
 class SendPushNotificationView(APIView):
     def post(self, request):

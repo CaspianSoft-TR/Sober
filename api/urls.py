@@ -3,7 +3,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from api import views
-from api.views import BookViewSet, DriverViewSet
+from api.views import BookViewSet, DriverViewSet, UserViewSet
 from api.views.mainViews import (
     CarListAPIView,
     CarCreateAPIView,
@@ -15,6 +15,8 @@ router = DefaultRouter()
 # Define API RESOURCES
 router.register(r'books', BookViewSet, basename='book')
 router.register(r'drivers', DriverViewSet, basename='driver')
+router.register(r'users', UserViewSet)
+
 # router.register(r'addresses', AccountViewSet)
 
 urlpatterns = [

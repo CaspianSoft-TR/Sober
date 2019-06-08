@@ -1,11 +1,9 @@
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
-from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 ##############################
 
 from django.db import models
-from django.contrib.auth.models import User
 
 
 ###############################
@@ -19,14 +17,16 @@ class BaseModel(models.Model):
 
 
 class UserInfo(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userinfo')
     is_driver = models.BooleanField(default=False)
     is_customer = models.BooleanField(default=True)
     phone = models.CharField(max_length=50)
     longitude = models.CharField(max_length=30, default=0)
+    dob = models.DateField(blank=True, null=True)
     latitude = models.CharField(max_length=30, default=0)
     firebase_token = models.CharField(max_length=255, default="")
     push_token = models.CharField(max_length=255, default="")
+    photo = models.ImageField(upload_to='uploads', blank=True)
 
     # verified_at = models.DateTimeField(auto_now_add=True, default=None)
 

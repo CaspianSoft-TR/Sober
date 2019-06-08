@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'allauth',
     'allauth.account',
+    'allauth.socialaccount',
     'api',
 ]
 
@@ -80,7 +81,7 @@ WSGI_APPLICATION = 'sober.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-'''
+
 # Local serve
 DATABASES = {
     'default': {
@@ -95,10 +96,9 @@ DATABASES = {
         'PORT': '3307',  # '3306',
     }
 }
+
 '''
-
-
-# Remote server
+# Remote server 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -112,6 +112,7 @@ DATABASES = {
         'PORT': '3306', 
     }
 }
+'''
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -161,7 +162,7 @@ PASSWORDLESS_AUTH = {
 JWT_AUTH = {
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'api.utils.custom_jwt.jwt_response_payload_handler',
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=15),  # Token expires * minutes after being issued
-    'JWT_AUTH_HEADER_PREFIX': 'Bearer', #'JWT'
+    'JWT_AUTH_HEADER_PREFIX': 'Bearer',  # 'JWT'
 }
 
 # JWT Settings
@@ -171,9 +172,10 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
-        # 'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ),
+    'PAGE_SIZE': 10
 }
 REST_USE_JWT = True
 

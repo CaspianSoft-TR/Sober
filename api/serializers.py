@@ -1,3 +1,6 @@
+from django.contrib.auth import password_validation
+from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import get_default_password_validators
 from django.db.models import Avg
 from rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers
@@ -8,6 +11,8 @@ from allauth.utils import (
     get_username_max_length
 )
 from allauth.account import app_settings as allauth_settings
+from rest_framework.exceptions import ValidationError
+from rest_framework.validators import UniqueValidator
 
 from api.models import (
     UserInfo,
@@ -15,22 +20,37 @@ from api.models import (
     UserCar,
     Address,
     Booking,
-    Driver
+    Driver,
 )
 
 
 ###########################################################
 
 class UserSerializer(UserDetailsSerializer):
+    password = serializers.CharField()
     phone = serializers.CharField(source="userinfo.phone")
     is_driver = serializers.BooleanField(source="userinfo.is_driver")
     is_customer = serializers.BooleanField(source="userinfo.is_customer")
 
     class Meta(UserDetailsSerializer.Meta):
-        fields = UserDetailsSerializer.Meta.fields + ('phone', 'is_driver', 'is_customer')
+        fields = UserDetailsSerializer.Meta.fields + ('phone', 'is_driver', 'is_customer', 'password')
+
+    def validate_password(self, value):
+        password_validation.validate_password(value, self.instance)
+        return value
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        profile_data = validated_data.pop('userinfo')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+
+        UserInfo.objects.create(user=user, **profile_data)
+
+        return user
 
     def update(self, instance, validated_data):
-        print("DENEME")
         profile_data = validated_data.pop('userinfo', {})
         phone = profile_data.get('phone')
 
@@ -69,91 +89,29 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
 
 #  CUSTOM REGISTER SERIALIZER
-class RegisterSerializer(serializers.Serializer):
-    username = serializers.CharField(
-        max_length=get_username_max_length(),
-        min_length=allauth_settings.USERNAME_MIN_LENGTH,
-        required=allauth_settings.USERNAME_REQUIRED
+class RegisterSerializer(UserSerializer):
+    email = serializers.EmailField(
+        max_length=100,
+        validators=[UniqueValidator(queryset=User.objects.all())]
     )
-    email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
-    password1 = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True)
-    phone = serializers.CharField(source="userinfo.phone")
-    is_driver = serializers.BooleanField(default=False)
-    is_customer = serializers.BooleanField(default=True)
 
-    def validate_username(self, username):
-        username = get_adapter().clean_username(username)
-        return username
-
-    def validate_email(self, email):
-        email = get_adapter().clean_email(email)
-        if allauth_settings.UNIQUE_EMAIL:
-            if email and email_address_exists(email):
-                raise serializers.ValidationError(("A user is already registered with this e-mail address."))
-        return email
-
-    def validate_password1(self, password):
-        return get_adapter().clean_password(password)
-
-    def validate(self, data):
-        if data['password1'] != data['password2']:
-            raise serializers.ValidationError(("The two password fields didn't match."))
-        return data
-
-    def custom_signup(self, request, user):
-        pass
-
-    def get_cleaned_data(self):
-        return {
-            'username': self.validated_data.get('username', ''),
-            'password1': self.validated_data.get('password1', ''),
-            'email': self.validated_data.get('email', '')
-        }
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + ('email',)
+        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        adapter = get_adapter()
-        user = adapter.new_user(validated_data)
-        self.cleaned_data = self.get_cleaned_data()
-        adapter.save_user(validated_data, user, self)
-        self.custom_signup(validated_data, user)
-        setup_user_email(validated_data, user, [])
-        #user.save()
+        password = validated_data.pop('password')
+        profile_data = validated_data.pop('userinfo')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
 
-        print('is driver', request.POST.get("is_driver"))
-        print('is_customer', request.POST.get("is_customer"))
+        UserInfo.objects.create(user=user, **profile_data)
 
-        newUserInfo = UserInfo()
-        newUserInfo.phone = request.POST.get("phone")
-        newUserInfo.is_customer = request.POST.get("is_customer")
-        newUserInfo.is_driver = request.POST.get("is_driver")
-        newUserInfo.user = user
-        #newUserInfo.save()
-
-        # userInfoData = request.POST.copy()
-        # print(">>>>>>>>>>>>><")
-        # print(request.POST.get("phone", ""))
-        # print(user.username)
-        # print(">>>>>>>>>>>>><")
-
-        # print(">>>>>>>>>>>>><")
-        # print(userInfoData)
-        # print(">>>>>>>>>>>>><")
-
-        # userInfo = UserInfoSerializer(data=userInfoData)
-        # is_valid() serializer data ile oluşması sonucu alınır
-        # if userInfo.is_valid():
-        # print(userInfo.validated_data)
-        # print(user.username)
-        # userInfo.save()
-
-        # print(user)
         return user
 
 
 # Verify Email
-
-
 class VerifyEmailSerializer(serializers.Serializer):
     key = serializers.CharField()
 
