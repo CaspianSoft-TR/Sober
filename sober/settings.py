@@ -81,7 +81,7 @@ WSGI_APPLICATION = 'sober.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
+'''
 # Local serve
 DATABASES = {
     'default': {
@@ -96,9 +96,9 @@ DATABASES = {
         'PORT': '3307',  # '3306',
     }
 }
-
 '''
-# Remote server 
+
+# Remote server
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -106,13 +106,12 @@ DATABASES = {
             'sql_mode': 'traditional',
         },
         'NAME': 'sober',
-        'USER': 'sober', 
-        'PASSWORD': 'CS20132015o@', 
+        'USER': 'sober',
+        'PASSWORD': 'CS20132015o@',
         'HOST': '160.153.204.5',
-        'PORT': '3306', 
+        'PORT': '3306',
     }
 }
-'''
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

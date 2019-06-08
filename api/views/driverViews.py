@@ -1,6 +1,7 @@
 from django.http import JsonResponse
-from rest_auth.serializers import UserDetailsSerializer
 from rest_framework import status, viewsets
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -34,8 +35,8 @@ class DriverLicenseView(APIView):
 
 
 class DriverViewSet(viewsets.ViewSet):
-    # permission_classes = (IsAuthenticated,)
-    # serializer_class = BookSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     """
     A simple ViewSet for listing or retrieving users.

@@ -8,9 +8,7 @@ from rest_framework.generics import (
     DestroyAPIView,
 )
 from rest_framework.views import APIView
-from rest_auth.registration.views import (
-    RegisterView,
-)
+
 from api.serializers import *
 from api.models import *
 
