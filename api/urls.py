@@ -22,8 +22,7 @@ router.register(r'users', UserViewSet)
 urlpatterns = [
 
     url(r'^auth/', include('rest_auth.urls')),
-
-    path('register/', views.RegisterView.as_view()),
+    url(r'^register/', views.RegisterView.as_view()),
 
     path('car/create', CarCreateAPIView.as_view(), name='car-add'),
     path('car/', CarListAPIView.as_view(), name='car-list'),

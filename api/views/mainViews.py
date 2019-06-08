@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.generics import (
     ListAPIView,
@@ -22,11 +22,9 @@ from api.utils import notifications
 ########################################
 
 class RegisterView(CreateAPIView):
-    queryset = UserInfo.objects.all()
     serializer_class = RegisterSerializer
-
-    # permission_classes = (IsAdminUser,)
-    # authentication_classes = (TokenAuthentication,)
+    permission_classes = (AllowAny,)
+    authentication_classes = (TokenAuthentication,)
 
     def post(self, request, *args, **kwargs):
         serializer = RegisterSerializer(data=request.data)
