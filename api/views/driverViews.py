@@ -1,22 +1,35 @@
 from django.http import JsonResponse
 from rest_framework import status, viewsets
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.parsers import FileUploadParser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.models import UserInfo
+from django.conf import settings
+import os
+
+from api.models import UserInfo, Driver
 from api.serializers import DriverIDSerializer, DriverLicenseSerializer, UserInfoSerializer
 
 
 class DriverIDView(APIView):
-    def post(self, request, format=None):
-        serializer = DriverIDSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    parser_class = (FileUploadParser,)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        driver_exists = Driver.objects.filter(user_id=user.id).exists()
+        if driver_exists is False:
+            file_serializer = DriverIDSerializer(data=request.data)
+            file_serializer.is_valid()
+            file_serializer.save(user=request.user)
+            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            driver = Driver.objects.filter(user_id=user.id).first()
+            file_serializer = DriverIDSerializer(driver, data=request.data)
+            file_serializer.is_valid()
+            file_serializer.save(user=request.user)
+            return Response(file_serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
 ########################################

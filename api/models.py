@@ -35,9 +35,7 @@ class UserInfo(models.Model):
 
 
 class Driver(models.Model):
-    # driver_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    # vehicle = models.ForeignKey(Car, on_delete=models.CASCADE)
     national_id = models.ImageField(upload_to='documents', blank=True)
     driver_license = models.ImageField(upload_to='documents', blank=True)
 

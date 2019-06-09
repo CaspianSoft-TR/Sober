@@ -151,11 +151,23 @@ class UserAddressSerializer(serializers.ModelSerializer):
 class DriverIDSerializer(serializers.ModelSerializer):
     class Meta:
         model = Driver
-        fields = (
+        fields = ('national_id',)
 
-            'national_id',
+    def create(self, validated_data):
+        user = validated_data.pop('user')
+        driver = Driver.objects.create(user=user, **validated_data)
+        return driver
 
-        )
+    def update(self, instance, validated_data):
+        user = validated_data.pop('user')
+        national_id = validated_data.pop('national_id')
+        instance.user = user
+        # first delete old image with source from server
+        instance.national_id.delete(False)
+        instance.national_id = national_id
+        instance.save()
+
+        return instance
 
 
 # Driver  DriverLicense serializer
