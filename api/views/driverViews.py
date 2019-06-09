@@ -38,13 +38,22 @@ class DriverIDView(APIView):
 
 
 class DriverLicenseView(APIView):
-    def post(self, request, format=None):
-        serializer = DriverLicenseSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    parser_class = (FileUploadParser,)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        driver_exists = Document.objects.filter(user_id=user.id).exists()
+        if driver_exists is False:
+            file_serializer = DriverLicenseSerializer(data=request.data)
+            file_serializer.is_valid()
+            file_serializer.save(user=request.user)
+            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            driver = Document.objects.filter(user_id=user.id).first()
+            file_serializer = DriverLicenseSerializer(driver, data=request.data)
+            file_serializer.is_valid()
+            file_serializer.save(user=request.user)
+            return Response(file_serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
 class DriverViewSet(viewsets.ViewSet):

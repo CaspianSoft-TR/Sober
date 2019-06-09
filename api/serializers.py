@@ -175,11 +175,23 @@ class DriverIDSerializer(serializers.ModelSerializer):
 class DriverLicenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
-        fields = (
+        fields = ('driver_license',)
 
-            'driver_license',
+    def create(self, validated_data):
+        user = validated_data.pop('user')
+        driver = Document.objects.create(user=user, **validated_data)
+        return driver
 
-        )
+    def update(self, instance, validated_data):
+        user = validated_data.pop('user')
+        driver_license = validated_data.pop('driver_license')
+        instance.user = user
+        # first delete old image with source from server
+        instance.driver_license.delete(False)
+        instance.driver_license = driver_license
+        instance.save()
+
+        return instance
 
 
 class BookingAddressSerializer(serializers.ListSerializer):

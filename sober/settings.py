@@ -81,7 +81,7 @@ WSGI_APPLICATION = 'sober.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
+'''
 # Local serve
 DATABASES = {
     'default': {
@@ -96,8 +96,8 @@ DATABASES = {
         'PORT': '3307',  # '3306',
     }
 }
-
 '''
+
 # Remote server 
 DATABASES = {
     'default': {
@@ -112,7 +112,7 @@ DATABASES = {
         'PORT': '3306', 
     }
 }
-'''
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -145,8 +145,7 @@ USE_TZ = True
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'sober/static'),
-    '/home/django/Sober/static/',
+    os.path.join(BASE_DIR, 'sober/static')
 ]
 
 ENV_PATH = os.path.abspath(os.path.dirname(__file__))
