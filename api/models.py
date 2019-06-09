@@ -34,7 +34,7 @@ class UserInfo(models.Model):
         return self.phone
 
 
-class Driver(models.Model):
+class Document(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     national_id = models.ImageField(upload_to='documents', blank=True)
     driver_license = models.ImageField(upload_to='documents', blank=True)
@@ -123,7 +123,7 @@ class BookDriver(BaseModel):
 
 ###
 class DriverLocation(models.Model):
-    driver_id = models.ForeignKey(Driver, on_delete=models.CASCADE)
+    driver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='driverlocation_driver_id', default=None)
     longitude = models.CharField(max_length=30)
     latitude = models.CharField(max_length=30)
     location_name = models.CharField(max_length=20)
@@ -136,7 +136,7 @@ class DriverLocation(models.Model):
 
 class Transaction(models.Model):
     order_id = models.AutoField(primary_key=True)
-    driver_id = models.ForeignKey(Driver, on_delete=models.CASCADE)
+    driver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transaction_driver_id', default=None)
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -145,7 +145,7 @@ class Transaction(models.Model):
 
 class Review(models.Model):
     review_id = models.AutoField(primary_key=True)
-    driver_id = models.ForeignKey(Driver, on_delete=models.CASCADE)
+    driver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='review_driver_id', default=None)
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
     comment = models.CharField(max_length=200)
 
@@ -154,7 +154,7 @@ class Review(models.Model):
 
 
 class DriverHistory(models.Model):
-    driver_id = models.ForeignKey(Driver, on_delete=models.CASCADE)
+    driver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='driverhistory_driver_id', default=None)
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
     # pickup_location = models.CharField(Category, max_length=20)
     # arrival_destination = models.CharField(Category, max_length=20)
@@ -163,7 +163,7 @@ class DriverHistory(models.Model):
 
 class TravelHistory(models.Model):
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    driver_id = models.ForeignKey(Driver, on_delete=models.CASCADE)
+    driver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='travelhistory_driver_id', default=None)
     # pickup_location = models.CharField(Category, max_length=20)
     # arrival_destination = models.CharField(Category, max_length=20)
     booked_time = models.DateTimeField(auto_now_add=True)

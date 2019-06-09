@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from django.conf import settings
 import os
 
-from api.models import UserInfo, Driver
+from api.models import UserInfo, Document
 from api.serializers import DriverIDSerializer, DriverLicenseSerializer, UserInfoSerializer
 
 
@@ -18,14 +18,14 @@ class DriverIDView(APIView):
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        driver_exists = Driver.objects.filter(user_id=user.id).exists()
+        driver_exists = Document.objects.filter(user_id=user.id).exists()
         if driver_exists is False:
             file_serializer = DriverIDSerializer(data=request.data)
             file_serializer.is_valid()
             file_serializer.save(user=request.user)
             return Response(file_serializer.data, status=status.HTTP_201_CREATED)
         else:
-            driver = Driver.objects.filter(user_id=user.id).first()
+            driver = Document.objects.filter(user_id=user.id).first()
             file_serializer = DriverIDSerializer(driver, data=request.data)
             file_serializer.is_valid()
             file_serializer.save(user=request.user)

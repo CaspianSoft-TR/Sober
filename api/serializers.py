@@ -20,8 +20,7 @@ from api.models import (
     UserCar,
     Address,
     Booking,
-    Driver,
-)
+    Document)
 
 
 ###########################################################
@@ -150,12 +149,12 @@ class UserAddressSerializer(serializers.ModelSerializer):
 
 class DriverIDSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Driver
+        model = Document
         fields = ('national_id',)
 
     def create(self, validated_data):
         user = validated_data.pop('user')
-        driver = Driver.objects.create(user=user, **validated_data)
+        driver = Document.objects.create(user=user, **validated_data)
         return driver
 
     def update(self, instance, validated_data):
@@ -175,7 +174,7 @@ class DriverIDSerializer(serializers.ModelSerializer):
 
 class DriverLicenseSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Driver
+        model = Document
         fields = (
 
             'driver_license',
