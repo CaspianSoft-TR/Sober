@@ -4,13 +4,15 @@ from django.contrib import admin
 # Register your models here.
 from django.contrib.auth.models import User
 
-from api.models import Booking, UserInfo, UserCar, Car
+from api.models import Booking, UserInfo, UserCar, Car, Driver
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import ugettext_lazy as _
 
 admin.site.register(Booking)
 admin.site.register(Car)
 admin.site.register(UserCar)
+admin.site.register(Driver)
+
 
 
 class UserInfoInline(admin.StackedInline):

@@ -22,9 +22,11 @@ from rest_framework import routers
 from rest_framework_jwt.views import obtain_jwt_token
 
 from api.views.mainViews import RegisterView
+from django.conf import settings
+from django.conf.urls.static import static
 
 router = routers.DefaultRouter()
-#router.register(r'users', views.UserViewSet)
+# router.register(r'users', views.UserViewSet)
 
 API_TITLE = 'Taxi Booking API'
 API_DESCRIPTION = 'API for Taxi Booking'
@@ -44,12 +46,14 @@ urlpatterns = [
     path('rest-auth/', include('rest_auth.urls')),
     path('rest-auth/registration/', include('rest_auth.registration.urls')),
 
-    # CUSTOM REGISTER DIRECTORY - it will remove
+    #  CUSTOM REGISTER DIRECTORY - it will remove
     url(r'^rest-auth/register/create/$', RegisterView.as_view(), name='custom-register'),
     path('', include('drfpasswordless.urls')),
 
     # JWT login
     url(r'^oauth/token', obtain_jwt_token),
 
-
 ]
+
+if settings.DEBUG:
+    urlpatterns = urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

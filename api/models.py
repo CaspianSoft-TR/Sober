@@ -38,12 +38,11 @@ class Driver(models.Model):
     # driver_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     # vehicle = models.ForeignKey(Car, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=50)
-    national_id = models.ImageField(upload_to='sober/static/national_id', blank=True)
-    driver_license = models.ImageField(upload_to='sober/static/driving_license', blank=True)
+    national_id = models.ImageField(upload_to='documents', blank=True)
+    driver_license = models.ImageField(upload_to='documents', blank=True)
 
     def __str__(self):
-        return self.phone
+        return self.user.username
 
 
 class Customer(models.Model):
@@ -61,7 +60,7 @@ class Car(BaseModel):
     added_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.car_brand
+        return self.brand
 
 
 class UserCar(BaseModel):
