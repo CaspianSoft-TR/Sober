@@ -87,6 +87,52 @@ class UserInfoSerializer(serializers.ModelSerializer):
         return instance
 
 
+# Driver National ID serializer
+class DriverIDSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Document
+        fields = ('national_id',)
+
+    def create(self, validated_data):
+        user = validated_data.pop('user')
+        driver = Document.objects.create(user=user, **validated_data)
+        return driver
+
+    def update(self, instance, validated_data):
+        user = validated_data.pop('user')
+        national_id = validated_data.pop('national_id')
+        instance.user = user
+        # first delete old image with source from server
+        instance.national_id.delete(False)
+        instance.national_id = national_id
+        instance.save()
+
+        return instance
+
+
+# Driver  DriverLicense serializer
+class DriverLicenseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Document
+        fields = ('driver_license',)
+
+    def create(self, validated_data):
+        user = validated_data.pop('user')
+        driver = Document.objects.create(user=user, **validated_data)
+        return driver
+
+    def update(self, instance, validated_data):
+        user = validated_data.pop('user')
+        driver_license = validated_data.pop('driver_license')
+        instance.user = user
+        # first delete old image with source from server
+        instance.driver_license.delete(False)
+        instance.driver_license = driver_license
+        instance.save()
+
+        return instance
+
+
 #  CUSTOM REGISTER SERIALIZER
 class RegisterSerializer(UserSerializer):
     email = serializers.EmailField(
@@ -94,18 +140,24 @@ class RegisterSerializer(UserSerializer):
         validators=[UniqueValidator(queryset=User.objects.all())]
     )
 
+    national_id = serializers.ImageField(source='document.national_id', required=False)
+    driver_license = serializers.ImageField(source='document.driver_license', required=False)
+
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ('email',)
+        fields = UserSerializer.Meta.fields + ('email', 'national_id', 'driver_license',)
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         password = validated_data.pop('password')
         profile_data = validated_data.pop('userinfo')
+        document = validated_data.pop('document')
+
         user = User(**validated_data)
         user.set_password(password)
         user.save()
 
         UserInfo.objects.create(user=user, **profile_data)
+        Document.objects.create(user=user, **document)
 
         return user
 
@@ -142,56 +194,6 @@ class UserAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
         fields = ('title', 'description', 'longitude', 'latitude')
-
-
-# Driver National ID serializer
-
-
-class DriverIDSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Document
-        fields = ('national_id',)
-
-    def create(self, validated_data):
-        user = validated_data.pop('user')
-        driver = Document.objects.create(user=user, **validated_data)
-        return driver
-
-    def update(self, instance, validated_data):
-        user = validated_data.pop('user')
-        national_id = validated_data.pop('national_id')
-        instance.user = user
-        # first delete old image with source from server
-        instance.national_id.delete(False)
-        instance.national_id = national_id
-        instance.save()
-
-        return instance
-
-
-# Driver  DriverLicense serializer
-
-
-class DriverLicenseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Document
-        fields = ('driver_license',)
-
-    def create(self, validated_data):
-        user = validated_data.pop('user')
-        driver = Document.objects.create(user=user, **validated_data)
-        return driver
-
-    def update(self, instance, validated_data):
-        user = validated_data.pop('user')
-        driver_license = validated_data.pop('driver_license')
-        instance.user = user
-        # first delete old image with source from server
-        instance.driver_license.delete(False)
-        instance.driver_license = driver_license
-        instance.save()
-
-        return instance
 
 
 class BookingAddressSerializer(serializers.ListSerializer):

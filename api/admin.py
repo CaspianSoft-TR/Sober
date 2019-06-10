@@ -4,7 +4,7 @@ from django.contrib import admin
 # Register your models here.
 from django.contrib.auth.models import User
 
-from api.models import Booking, UserInfo, UserCar, Car
+from api.models import Booking, UserInfo, UserCar, Car, Document
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import ugettext_lazy as _
 
@@ -15,6 +15,11 @@ admin.site.register(UserCar)
 
 class UserInfoInline(admin.StackedInline):
     model = UserInfo
+    can_delete = False
+
+
+class DocumentsInline(admin.StackedInline):
+    model = Document
     can_delete = False
 
 
@@ -33,7 +38,7 @@ class UserAdmin(BaseUserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
-    inlines = (UserInfoInline,)
+    inlines = (UserInfoInline, DocumentsInline,)
 
 
 admin.site.unregister(User)  # First unregister the old class

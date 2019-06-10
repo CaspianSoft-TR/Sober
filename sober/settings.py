@@ -81,8 +81,8 @@ WSGI_APPLICATION = 'sober.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-'''
 # Local serve
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
