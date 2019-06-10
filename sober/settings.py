@@ -23,7 +23,7 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 SECRET_KEY = '!-rype8$$jtiphg=^yg3hdl2^#5+p@0yw3++=v$$)34@5(%4a8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # ALLOW ALL HOSTS
 ALLOWED_HOSTS = ['*']
@@ -82,37 +82,34 @@ WSGI_APPLICATION = 'sober.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 # Local serve
-'''
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'sql_mode': 'traditional',
-        },
-        'NAME': 'sober',
-        'USER': 'developer',  # 'root',
-        'PASSWORD': 'CS4204747o@',  # 'root',
-        'HOST': '127.0.0.1',
-        'PORT': '3307',  # '3306',
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'OPTIONS': {
+                'sql_mode': 'traditional',
+            },
+            'NAME': 'sober',
+            'USER': 'developer',  # 'root',
+            'PASSWORD': 'CS4204747o@',  # 'root',
+            'HOST': '127.0.0.1',
+            'PORT': '3307',  # '3306',
+        }
     }
-}
-'''
-
-# Remote server 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'sql_mode': 'traditional',
-        },
-        'NAME': 'sober',
-        'USER': 'sober', 
-        'PASSWORD': 'CS20132015o@', 
-        'HOST': '160.153.204.5',
-        'PORT': '3306', 
+else:  # Remote server
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'OPTIONS': {
+                'sql_mode': 'traditional',
+            },
+            'NAME': 'sober',
+            'USER': 'sober',
+            'PASSWORD': 'CS20132015o@',
+            'HOST': '160.153.204.5',
+            'PORT': '3306',
+        }
     }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -154,7 +151,6 @@ MEDIA_URL = '/media/'
 
 SITE_ID = 1
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
 
 PASSWORDLESS_AUTH = {
 

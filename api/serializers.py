@@ -87,6 +87,12 @@ class UserInfoSerializer(serializers.ModelSerializer):
         return instance
 
 
+class DocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Document
+        fields = ('national_id', 'driver_license')
+
+
 # Driver National ID serializer
 class DriverIDSerializer(serializers.ModelSerializer):
     class Meta:
@@ -135,16 +141,18 @@ class DriverLicenseSerializer(serializers.ModelSerializer):
 
 #  CUSTOM REGISTER SERIALIZER
 class RegisterSerializer(UserSerializer):
+    document = DocumentSerializer(required=False)
+
     email = serializers.EmailField(
         max_length=100,
         validators=[UniqueValidator(queryset=User.objects.all())]
     )
 
-    national_id = serializers.ImageField(source='document.national_id', required=False)
-    driver_license = serializers.ImageField(source='document.driver_license', required=False)
+    national_id = serializers.ImageField(source='document.national_id', required=False, default=None)
+    driver_license = serializers.ImageField(source='document.driver_license', required=False, default=None)
 
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ('email', 'national_id', 'driver_license',)
+        fields = UserSerializer.Meta.fields + ('email', 'national_id', 'driver_license', 'document')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -158,7 +166,6 @@ class RegisterSerializer(UserSerializer):
 
         UserInfo.objects.create(user=user, **profile_data)
         Document.objects.create(user=user, **document)
-
         return user
 
 
