@@ -145,7 +145,7 @@ USE_TZ = True
 STATIC_ROOT = "/home/django/Sober/sober/static/"
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'sober/static')
+    os.path.join(BASE_DIR, 'sober/')
 ]
 
 ENV_PATH = os.path.abspath(os.path.dirname(__file__))

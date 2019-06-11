@@ -67,10 +67,9 @@ def findProperDrivers(bookId):
     for bookDriver in BookDriver.objects.all().filter(book_id=bookId):
         improperDriverIdList.append(bookDriver.driver.id)
 
-    # For testing we comment it for now, after we will unco
-    # WORKING DRIVER 
-    # for book in Booking.objects.all().filter(status=1):
-    # improperDriverIdList.append(book.driver.id)
+    # WORKING DRIVER
+    for book in Booking.objects.all().filter(Q(status=1) | Q(status=20)):
+        improperDriverIdList.append(book.driver.id)
 
     # BOOK OWNER
     improperDriverIdList.append(Booking.objects.get(id=bookId).customer.id)
