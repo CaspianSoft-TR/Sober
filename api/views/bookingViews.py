@@ -84,28 +84,37 @@ class BookingListAPIView(ListAPIView):
 
 class BookingCancelAPIView(APIView):
     def get_queryset(self):
-        queryset = Booking.objects.filter(customer_id=self.request.user.id, status=0, id=self.request.POST.get('id'))
-        return queryset
+        if Booking.objects.filter(id=self.request.POST.get('id')).exists():
+            queryset = Booking.objects.get(pk=self.request.POST.get('id'))
+            return queryset
 
     def put(self, request, format=None):
-        print(">>> >>> BookingCancelAPIView put called")
-        bookList = self.get_queryset()
+        book = self.get_queryset()
+        driverUserInfo = UserInfo.objects.get(user_id=book.driver.id)
+
         result = {}
-        if bookList.count() == 0:
+        if not book:
             result["resultCode"] = 200
             result["resultText"] = "SUCCESS_EMPTY"
             result["content"] = "Book Not Found Error"
-        elif bookList.count() > 1:
-            result["resultCode"] = 200
-            result["resultText"] = "FAILURE"
-            result["content"] = "Multiple Book Error"
         else:
-            book = bookList.first()
             book.status = 100
             book.save()
+
             result["resultCode"] = 100
             result["resultText"] = "SUCCESS"
             result["content"] = "Customer's book status was changed to CANCEL"
+
+            # push message body
+            messageBody = {
+                'book': {
+                    'status': 'cancelled',
+                    'book_id': book.id,
+                }
+            }
+
+            # notify driver
+            notifications.send_push_message(driverUserInfo.push_token, 'Sifariş imtina edildi!', messageBody)
         return JsonResponse(result)
 
 
@@ -186,13 +195,15 @@ class BookingAcceptDriverAPIView(APIView):
             customerUserInfo = UserInfo.objects.get(user_id=book.customer.id)
             driverUserInfo = UserInfo.objects.get(user_id=book.driver.id)
 
+            room_id = 'room-' + utils.make_uuid()
+
             # Driver Accepted Case
             acceptDriver = int(request.POST.get('accept'))
             if acceptDriver == 1:
                 book.status = 1
+                book.room_id = room_id
                 book.save()
 
-                room_id = 'room-' + utils.make_uuid()
                 data = {
                     "driver": {
                         "id": driverUserInfo.user_id,
@@ -359,7 +370,7 @@ class BookViewSet(viewsets.ViewSet):
         }
         return JsonResponse(response)
 
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticatedOrReadOnly])
+    @action(methods=['post'], detail=True, permission_classes=[IsAuthenticated], url_path='arrived')
     def arrived(self, request, pk=None):
         book = Booking.objects.get(pk=pk)
         book.status = 20

@@ -101,3 +101,22 @@ class DriverViewSet(viewsets.ViewSet):
             'content': serializer.data
         }
         return JsonResponse(response)
+
+    @action(methods=['get'], detail=True, permission_classes=[IsAuthenticated], url_path='has-tracking')
+    def tracking(self, request, pk=None):
+        book = Booking.objects.filter(driver_id=request.user.id, status=1).first()
+        if book is None:
+            response = {
+                'resultCode': 200,
+                'resultText': 'SUCCESS_EMPTY',
+                'content': "No tracking book found!"
+            }
+            return JsonResponse(response)
+
+        serializer = BookSerializer(book)
+        response = {
+            'resultCode': 100,
+            'resultText': 'SUCCESS',
+            'content': serializer.data
+        }
+        return JsonResponse(response)

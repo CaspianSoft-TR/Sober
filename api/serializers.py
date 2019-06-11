@@ -1,17 +1,8 @@
 from django.contrib.auth import password_validation
 from django.contrib.auth.models import User
-from django.contrib.auth.password_validation import get_default_password_validators
 from django.db.models import Avg
 from rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers
-from allauth.account.adapter import get_adapter
-from allauth.account.utils import setup_user_email
-from allauth.utils import (
-    email_address_exists,
-    get_username_max_length
-)
-from allauth.account import app_settings as allauth_settings
-from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
 
 from api.models import (
@@ -316,5 +307,5 @@ class BookSerializer(serializers.ModelSerializer):
         return serializer.data
 
     class Meta:
-        fields = ('id', 'status', 'total_distance', 'price', 'driver', 'customer', 'pickUp_address', 'dropOff_address')
+        fields = ('id', 'status', 'total_distance', 'price', 'driver', 'customer', 'pickUp_address', 'dropOff_address', 'room_id')
         model = Booking

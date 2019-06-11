@@ -89,6 +89,7 @@ class Booking(BaseModel):
     total_distance = models.IntegerField(default=0)
     total_distance_type = models.IntegerField(choices=((0, 'KM'), (1, 'MILES')), default=0)
     price = models.IntegerField(default=0)
+    room_id = models.CharField(max_length=100, null=True, blank=True)
     price_currency = models.IntegerField(choices=((1, 'AZN'), (2, 'TL')), default=1)
 
     def __str__(self):
