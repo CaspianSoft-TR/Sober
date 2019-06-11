@@ -1,16 +1,16 @@
 from django.http import JsonResponse
 from rest_framework import status, viewsets
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import action
 from rest_framework.parsers import FileUploadParser
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from django.conf import settings
-import os
+from api.permissions import IsLoggedInUserOrAdmin
 
-from api.models import UserInfo, Document
-from api.serializers import DriverIDSerializer, DriverLicenseSerializer, UserInfoSerializer
+from api.models import UserInfo, Document, Booking
+from api.serializers import DriverIDSerializer, DriverLicenseSerializer, UserInfoSerializer, BookSerializer
 
 
 class DriverIDView(APIView):
@@ -57,7 +57,6 @@ class DriverLicenseView(APIView):
 
 
 class DriverViewSet(viewsets.ViewSet):
-    authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     """
@@ -77,6 +76,25 @@ class DriverViewSet(viewsets.ViewSet):
     def list(self, request):
         drivers = UserInfo.objects.filter(is_driver=1).all()
         serializer = UserInfoSerializer(drivers, many=True)
+        response = {
+            'resultCode': 100,
+            'resultText': 'SUCCESS',
+            'content': serializer.data
+        }
+        return JsonResponse(response)
+
+    @action(methods=['get'], detail=True, permission_classes=[IsAuthenticated], url_path='has-book')
+    def has_new_book(self, request, pk=None):
+        book = Booking.objects.filter(status=10, driver_id=request.user.id).last()
+        if book is None:
+            response = {
+                'resultCode': 200,
+                'resultText': 'SUCCESS_EMPTY',
+                'content': "No new book found!"
+            }
+            return JsonResponse(response)
+
+        serializer = BookSerializer(book)
         response = {
             'resultCode': 100,
             'resultText': 'SUCCESS',

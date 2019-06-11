@@ -7,6 +7,7 @@ from rest_framework.decorators import action, permission_classes
 from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.views import APIView
 
+from api.permissions import DriverAcceptPermission
 from api.utils import utils, notifications, firebase
 from api.models import Booking, Address, UserInfo, BookDriver
 from api.serializers import CreateBookingSerializer, BookSerializer, UserInfoSerializer
@@ -162,27 +163,26 @@ class BookingSearchDriverAPIView(APIView):
 
 
 class BookingAcceptDriverAPIView(APIView):
+    permission_classes = (DriverAcceptPermission,)
+
     def __init__(self):
         self.firebase = Firebase()
 
     def get_queryset(self):
-        queryset = Booking.objects.filter(driver_id=self.request.user.id, id=self.request.POST.get('book_id'))
-        return queryset
+        if Booking.objects.filter(id=self.request.POST.get('book_id')).exists():
+            queryset = Booking.objects.get(pk=self.request.POST.get('book_id'))
+            return queryset
 
     def put(self, request, format=None):
-        bookList = self.get_queryset()
+        book = self.get_queryset()
+        self.check_object_permissions(request, book)
         result = {}
-        if bookList.count() == 0:
+        if not book:
             result["resultCode"] = 200
             result["resultText"] = "SUCCESS_EMPTY"
             result["content"] = "Book Not Found Error"
-        elif bookList.count() > 1:
-            result["resultCode"] = 200
-            result["resultText"] = "FAILURE"
-            result["content"] = "Multiple Book Error"
         else:
 
-            book = bookList.first()
             customerUserInfo = UserInfo.objects.get(user_id=book.customer.id)
             driverUserInfo = UserInfo.objects.get(user_id=book.driver.id)
 

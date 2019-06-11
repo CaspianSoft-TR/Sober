@@ -88,6 +88,7 @@ if DEBUG:
             'ENGINE': 'django.db.backends.mysql',
             'OPTIONS': {
                 'sql_mode': 'traditional',
+                'charset': 'utf8mb4'
             },
             'NAME': 'sober',
             'USER': 'developer',  # 'root',
@@ -102,6 +103,7 @@ else:  # Remote server
             'ENGINE': 'django.db.backends.mysql',
             'OPTIONS': {
                 'sql_mode': 'traditional',
+                'charset': 'utf8mb4'
             },
             'NAME': 'sober',
             'USER': 'sober',
@@ -139,7 +141,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+STATIC_ROOT = "/home/django/Sober/sober/static/"
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'sober/static')
@@ -174,7 +177,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
 }

@@ -101,10 +101,10 @@ class Booking(BaseModel):
 class Address(models.Model):
     booking = models.ForeignKey(Booking, null=True, on_delete=models.CASCADE, related_name='booking_id')
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name='user_id')
-    title = models.CharField(max_length=50)
-    description = models.CharField(max_length=50)
-    longitude = models.CharField(max_length=30, default=0)
-    latitude = models.CharField(max_length=30, default=0)
+    title = models.CharField(max_length=55)
+    description = models.CharField(max_length=255)
+    longitude = models.CharField(max_length=55, default=0)
+    latitude = models.CharField(max_length=55, default=0)
     is_pickup_loc = models.BooleanField(default=False)
     is_arrival_loc = models.BooleanField(default=False)
 
