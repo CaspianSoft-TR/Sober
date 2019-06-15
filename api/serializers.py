@@ -133,6 +133,7 @@ class DriverLicenseSerializer(serializers.ModelSerializer):
 #  CUSTOM REGISTER SERIALIZER
 class RegisterSerializer(UserSerializer):
     document = DocumentSerializer(required=False)
+    confirm_password = serializers.CharField(write_only=True)
 
     email = serializers.EmailField(
         max_length=100,
@@ -143,15 +144,23 @@ class RegisterSerializer(UserSerializer):
     driver_license = serializers.ImageField(source='document.driver_license', required=False, default=None)
 
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ('email', 'national_id', 'driver_license', 'document')
+        fields = UserSerializer.Meta.fields + ('email', 'national_id', 'driver_license', 'document', 'confirm_password')
         extra_kwargs = {'password': {'write_only': True}}
+
+    def validate(self, data):
+        if data['password'] != data['confirm_password']:
+            raise serializers.ValidationError(("The two password fields didn't match."))
+        return data
 
     def create(self, validated_data):
         password = validated_data.pop('password')
         profile_data = validated_data.pop('userinfo')
         document = validated_data.pop('document')
 
-        user = User(**validated_data)
+        username = validated_data.pop('username')
+        email = validated_data.pop('email')
+
+        user = User(username=username, password=password, email=email)
         user.set_password(password)
         user.save()
 
@@ -307,5 +316,7 @@ class BookSerializer(serializers.ModelSerializer):
         return serializer.data
 
     class Meta:
-        fields = ('id', 'status', 'total_distance', 'price', 'driver', 'customer', 'pickUp_address', 'dropOff_address', 'room_id')
+        fields = (
+            'id', 'status', 'total_distance', 'price', 'driver', 'customer', 'pickUp_address', 'dropOff_address',
+            'room_id')
         model = Booking
