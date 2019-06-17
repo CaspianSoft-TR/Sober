@@ -120,3 +120,41 @@ class DriverViewSet(viewsets.ViewSet):
             'content': serializer.data
         }
         return JsonResponse(response)
+
+    @action(methods=['get'], detail=True, permission_classes=[IsAuthenticated], url_path='history')
+    def tracking(self, request, pk=None):
+        books = Booking.objects.filter(driver_id=request.user.id, status=200).all()
+        if books.count() == 0:
+            response = {
+                'resultCode': 200,
+                'resultText': 'SUCCESS_EMPTY',
+                'content': "No tracking book found!"
+            }
+            return JsonResponse(response)
+
+        serializer = BookSerializer(books, many=True)
+        response = {
+            'resultCode': 100,
+            'resultText': 'SUCCESS',
+            'content': serializer.data
+        }
+        return JsonResponse(response)
+
+    @action(methods=['get'], detail=True, permission_classes=[IsAuthenticated], url_path='on-way')
+    def on_the_way(self, request, pk=None):
+        book = Booking.objects.filter(status=20, driver_id=request.user.id).last()
+        if book is None:
+            response = {
+                'resultCode': 200,
+                'resultText': 'SUCCESS_EMPTY',
+                'content': "Book not found!"
+            }
+            return JsonResponse(response)
+
+        serializer = BookSerializer(book)
+        response = {
+            'resultCode': 100,
+            'resultText': 'SUCCESS',
+            'content': serializer.data
+        }
+        return JsonResponse(response)
