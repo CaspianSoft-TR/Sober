@@ -122,7 +122,7 @@ class DriverViewSet(viewsets.ViewSet):
         return JsonResponse(response)
 
     @action(methods=['get'], detail=True, permission_classes=[IsAuthenticated], url_path='history')
-    def tracking(self, request, pk=None):
+    def history(self, request, pk=None):
         books = Booking.objects.filter(driver_id=request.user.id, status=200).all()
         if books.count() == 0:
             response = {

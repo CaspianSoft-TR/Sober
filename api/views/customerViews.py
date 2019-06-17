@@ -80,7 +80,7 @@ class CustomerViewSet(viewsets.ViewSet):
         return JsonResponse(response)
 
     @action(methods=['get'], detail=True, permission_classes=[IsAuthenticated], url_path='history')
-    def tracking(self, request, pk=None):
+    def history(self, request, pk=None):
         books = Booking.objects.filter(Q(status='200') | Q(status='100'), customer_id=request.user.id).all()
         if books.count() == 0:
             response = {
