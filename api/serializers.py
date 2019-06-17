@@ -23,7 +23,13 @@ class UserSerializer(UserDetailsSerializer):
     is_customer = serializers.BooleanField(source="userinfo.is_customer")
 
     class Meta(UserDetailsSerializer.Meta):
+        extra_kwargs = {'password': {'write_only': True}}
         fields = UserDetailsSerializer.Meta.fields + ('phone', 'is_driver', 'is_customer', 'password')
+
+    def to_representation(self, obj):
+        rep = super(UserSerializer, self).to_representation(obj)
+        rep.pop('password', None)
+        return rep
 
     def validate_password(self, value):
         password_validation.validate_password(value, self.instance)
@@ -300,8 +306,8 @@ class TESTSerializer(serializers.Serializer):
 
 
 class BookSerializer(serializers.ModelSerializer):
-    driver = UserDetailsSerializer()
-    customer = UserDetailsSerializer()
+    driver = UserSerializer()
+    customer = UserSerializer()
     pickUp_address = serializers.SerializerMethodField()
     dropOff_address = serializers.SerializerMethodField()
 
