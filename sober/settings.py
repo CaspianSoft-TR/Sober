@@ -180,6 +180,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
+    # 'EXCEPTION_HANDLER': 'api.utils.exceptions.custom_exception_handler'
+
 }
 REST_USE_JWT = True
 

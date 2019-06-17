@@ -84,14 +84,12 @@ class BookingListAPIView(ListAPIView):
 
 class BookingCancelAPIView(APIView):
     def get_queryset(self):
-        if Booking.objects.filter(id=self.request.POST.get('id')).exists():
+        if Booking.objects.filter(pk=self.request.POST.get('id')).exists():
             queryset = Booking.objects.get(pk=self.request.POST.get('id'))
             return queryset
 
     def put(self, request, format=None):
         book = self.get_queryset()
-        driverUserInfo = UserInfo.objects.get(user_id=book.driver.id)
-
         result = {}
         if not book:
             result["resultCode"] = 200
@@ -114,6 +112,7 @@ class BookingCancelAPIView(APIView):
             }
 
             # notify driver
+            driverUserInfo = UserInfo.objects.get(user_id=book.driver_id)
             notifications.send_push_message(driverUserInfo.push_token, 'Sifariş imtina edildi!', messageBody)
         return JsonResponse(result)
 
