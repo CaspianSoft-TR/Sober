@@ -268,23 +268,18 @@ class BookingAcceptDriverAPIView(APIView):
 # "book_id" her ne kadar gerekmese de veritabanında kontrol amacıyla konulmuştur
 class BookingCompletedAPIView(APIView):
     def get_queryset(self):
-        queryset = Booking.objects.filter(driver_id=self.request.user.id, id=self.request.POST.get('book_id'), status=1)
-        return queryset
+        if Booking.objects.filter(id=self.request.POST.get('book_id')).exists():
+            queryset = Booking.objects.get(pk=self.request.POST.get('book_id'))
+            return queryset
 
     def put(self, request, format=None):
-        print(">>> >>> BookingCompletedAPIView put called")
-        bookList = self.get_queryset()
+        book = self.get_queryset()
         result = {}
-        if bookList.count() == 0:
+        if not book:
             result["resultCode"] = 200
             result["resultText"] = "SUCCESS_EMPTY"
             result["content"] = "Book Not Found Error"
-        elif bookList.count() > 1:
-            result["resultCode"] = 200
-            result["resultText"] = "FAILURE"
-            result["content"] = "Multiple Book Error"
         else:
-            book = bookList.first()
             book.setStatusToComplete()
             book.save()
             result["resultCode"] = 100
