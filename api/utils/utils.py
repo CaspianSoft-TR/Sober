@@ -62,12 +62,12 @@ def send_message(token, messageType, messageBody):
 def findProperDrivers(bookId):
     from django.db.models import Q
 
-    # REJECTED USERS
+    # REJECTED & CANCELLED USERS
     improperDriverIdList = []
     for bookDriver in BookDriver.objects.all().filter(book_id=bookId):
         improperDriverIdList.append(bookDriver.driver.id)
 
-    # WORKING DRIVER
+    # Find Working Drivers
     for book in Booking.objects.all().filter(Q(status=1) | Q(status=20)):
         improperDriverIdList.append(book.driver.id)
 

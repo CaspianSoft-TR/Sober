@@ -96,8 +96,15 @@ class BookingCancelAPIView(APIView):
             result["resultText"] = "SUCCESS_EMPTY"
             result["content"] = "Book Not Found Error"
         else:
+
             book.status = 100
             book.save()
+
+            # add to improper drivers for the given book
+            bookDriver = BookDriver()
+            bookDriver.driver = User.objects.get(id=book.driver.id)
+            bookDriver.book = book
+            bookDriver.save()
 
             result["resultCode"] = 100
             result["resultText"] = "SUCCESS"
@@ -113,7 +120,8 @@ class BookingCancelAPIView(APIView):
 
             # notify driver
             driverUserInfo = UserInfo.objects.get(user_id=book.driver_id)
-            notifications.send_push_message(driverUserInfo.push_token, 'Sifariş imtina edildi!', messageBody)
+            if driverUserInfo:
+                notifications.send_push_message(driverUserInfo.push_token, 'Sifariş imtina edildi!', messageBody)
         return JsonResponse(result)
 
 
