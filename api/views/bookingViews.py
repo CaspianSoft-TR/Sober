@@ -295,6 +295,19 @@ class BookingCompletedAPIView(APIView):
             result["content"] = {
                 'book_status': book.status
             }
+
+            customerUserInfo = UserInfo.objects.get(user_id=book.customer.id)
+
+            messageBody = {
+                'driver': {
+                    'status': 'completed',
+                    'driver_id': book.driver.id,
+                    'respond': 200
+                }
+            }
+
+            # notify customer
+            notifications.send_push_message(customerUserInfo.push_token, 'Sürüş bitdi', messageBody)
         return JsonResponse(result)
 
 
